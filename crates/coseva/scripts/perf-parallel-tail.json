@@ -1,0 +1,54 @@
+{
+  "command": "crates/coseva/scripts/perf_parallel_tail.rs",
+  "metric": "inter_batch_delivery_gap_percentiles_microseconds",
+  "host": {
+    "hostname": "mataille-devbox-1",
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "logical_cpus": 16
+  },
+  "rustc": "rustc 1.98.0-nightly (6368fd52c 2026-05-29)",
+  "document_bytes": 67108883,
+  "repeats": 5,
+  "cases": [
+    {
+      "batch_records": 32,
+      "batches": 94148,
+      "total_ms": 1046.502,
+      "gap_p50_us": 0.5,
+      "gap_p90_us": 23.9,
+      "gap_p99_us": 98.901,
+      "gap_max_us": 580.11,
+      "tail_ratio": 197.802
+    },
+    {
+      "batch_records": 256,
+      "batches": 11785,
+      "total_ms": 802.795,
+      "gap_p50_us": 73.501,
+      "gap_p90_us": 104.602,
+      "gap_p99_us": 163.502,
+      "gap_max_us": 2987.852,
+      "tail_ratio": 2.224
+    },
+    {
+      "batch_records": 4096,
+      "batches": 794,
+      "total_ms": 90.517,
+      "gap_p50_us": 29.901,
+      "gap_p90_us": 104.102,
+      "gap_p99_us": 1025.318,
+      "gap_max_us": 2096.336,
+      "tail_ratio": 34.29
+    },
+    {
+      "batch_records": 16384,
+      "batches": 256,
+      "total_ms": 109.831,
+      "gap_p50_us": 126.203,
+      "gap_p90_us": 848.415,
+      "gap_p99_us": 1943.033,
+      "gap_max_us": 4161.072,
+      "tail_ratio": 15.396
+    }
+  ]
+}

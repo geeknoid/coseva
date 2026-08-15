@@ -1,0 +1,5 @@
+error: unsupported csv field attribute
+ --> tests/ui/fail/attr_unknown_field.rs:7:11
+  |
+7 |     #[csv(bogus)]
+  |           ^^^^^

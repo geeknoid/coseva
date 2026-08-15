@@ -1,0 +1,183 @@
+name: Mutants
+
+# The full mutation sweep over the workspace.
+#
+# `.cargo/mutants.toml` is the shared configuration; `ci.yml`'s `mutants` job
+# consumes it per pull request scoped to the change with `--in-diff`, and this
+# workflow runs the whole set. The workspace generates roughly 4,700 mutants
+# and each one is a build plus a test run, so this is sharded across parallel
+# runners and scheduled weekly rather than gating a merge.
+#
+# What survives matters more than what dies. A surviving mutant is a change to
+# the code that no test noticed, which is either a missing assertion or a piece
+# of behavior nobody depends on. The `report` job below collects every shard's
+# survivors into one artifact so the list can be triaged as a whole;
+# `crates/coseva/docs/TESTING.md` records the accepted survivors and why.
+
+on:
+  schedule:
+    - cron: "0 3 * * 0"
+  workflow_dispatch:
+    inputs:
+      shards:
+        description: "Number of shards to split the mutant set across."
+        required: false
+        default: "8"
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  mutants:
+    name: mutants (shard ${{ matrix.shard }}/8)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: taiki-e/install-action@cargo-mutants
+
+      - uses: Swatinem/rust-cache@v2
+
+      # A shard that finds survivors is information, not a failure: the run
+      # must reach the report job so the whole list is collected in one place.
+      - name: cargo mutants --shard ${{ matrix.shard }}/8
+        continue-on-error: true
+        run: cargo mutants --shard ${{ matrix.shard }}/8 --test-tool cargo -j 2 --all-features
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mutants-shard-${{ matrix.shard }}
+          path: mutants.out/
+
+  # `--all-features` compiles every `#[cfg(not(feature = "std"))]` body out.
+  # `cargo-mutants` rewrites source before `cfg` is resolved, so it still
+  # generates mutants there, applies them to code the compiler then discards,
+  # and reports them as survivors no test could have killed. The sweep above
+  # therefore says nothing about the alloc-only surface, which is on the
+  # crate's "must not break" list.
+  #
+  # This job runs the same mutants in the configuration where that code exists.
+  # It is scoped to the files that actually carry an alloc-only branch rather
+  # than sharded across the whole workspace a second time: the point is to
+  # measure the branches `--all-features` cannot see, not to re-measure code
+  # the sweep above already covered. The file list is derived from the source
+  # so a new alloc-only branch joins it without anyone remembering to.
+  mutants-alloc-only:
+    name: mutants (alloc-only)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: taiki-e/install-action@cargo-mutants
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: cargo mutants --no-default-features
+        continue-on-error: true
+        run: |
+          mapfile -t files < <(grep -rl 'not(feature = "std")' crates/*/src --include='*.rs')
+          echo "alloc-only branches in ${#files[@]} files:"
+          printf '  %s\n' "${files[@]}"
+          args=()
+          for file in "${files[@]}"; do
+            args+=(--file "$file")
+          done
+          cargo mutants --no-default-features --test-tool cargo -j 2 "${args[@]}"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mutants-alloc-only
+          path: mutants.out/
+
+  report:
+    name: report
+    needs: [mutants, mutants-alloc-only]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: mutants-shard-*
+          path: shards
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: mutants-alloc-only
+          path: alloc-only
+
+      - name: Collect every shard's survivors
+        run: |
+          : > missed.txt
+          : > timeout.txt
+          : > unviable.txt
+          for dir in shards/mutants-shard-*; do
+            cat "$dir/missed.txt" >> missed.txt 2>/dev/null || true
+            cat "$dir/timeout.txt" >> timeout.txt 2>/dev/null || true
+            cat "$dir/unviable.txt" >> unviable.txt 2>/dev/null || true
+          done
+          sort -u -o missed.txt missed.txt
+          sort -u -o timeout.txt timeout.txt
+          sort -u -o unviable.txt unviable.txt
+          {
+            echo "## Mutation sweep"
+            echo
+            echo "| outcome | count |"
+            echo "| --- | --- |"
+            echo "| survived (missed) | $(wc -l < missed.txt) |"
+            echo "| timed out | $(wc -l < timeout.txt) |"
+            echo "| unviable (did not build) | $(wc -l < unviable.txt) |"
+            echo
+            echo "Survivors are changes to the code that no test noticed."
+            echo "Triage each against \`crates/coseva/docs/TESTING.md\`."
+            echo
+            echo '```'
+            head -200 missed.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Reported separately rather than folded into the counts above: it is a
+      # different feature configuration over a different set of files, and
+      # adding the two together would produce a number that describes neither.
+      - name: Report the alloc-only survivors
+        run: |
+          cp alloc-only/missed.txt missed-alloc-only.txt 2>/dev/null || : > missed-alloc-only.txt
+          {
+            echo
+            echo "## Mutation sweep (alloc-only)"
+            echo
+            echo "\`--no-default-features\`, over the files carrying a"
+            echo "\`#[cfg(not(feature = \"std\"))]\` branch. The sweep above cannot see"
+            echo "this code at all: it is compiled out, so its mutants survive whatever"
+            echo "the tests do."
+            echo
+            echo "| outcome | count |"
+            echo "| --- | --- |"
+            echo "| survived (missed) | $(wc -l < missed-alloc-only.txt) |"
+            echo
+            echo '```'
+            head -200 missed-alloc-only.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mutants-survivors
+          path: |
+            missed.txt
+            timeout.txt
+            unviable.txt
+            missed-alloc-only.txt

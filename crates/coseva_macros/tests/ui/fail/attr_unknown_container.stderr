@@ -1,0 +1,5 @@
+error: unsupported csv container attribute
+ --> tests/ui/fail/attr_unknown_container.rs:6:7
+  |
+6 | #[csv(bogus)]
+  |       ^^^^^

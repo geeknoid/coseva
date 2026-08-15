@@ -1,0 +1,5 @@
+error: duplicate csv alias "town"
+ --> tests/ui/fail/attr_duplicate_alias.rs:8:35
+  |
+8 |     #[csv(alias = "town", alias = "town")]
+  |                                   ^^^^^^

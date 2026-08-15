@@ -1,0 +1,7 @@
+error[E0277]: the trait bound `u32: AsRef<[u8]>` is not satisfied
+  --> tests/ui/fail_rustc/format_with_wrong_return.rs:10:10
+   |
+10 | #[derive(CsvEncode)]
+   |          ^^^^^^^^^ the trait `AsRef<[u8]>` is not implemented for `u32`
+   |
+   = note: this error originates in the derive macro `CsvEncode` (in Nightly builds, run with -Z macro-backtrace for more info)

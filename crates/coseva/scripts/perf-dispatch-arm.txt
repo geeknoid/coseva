@@ -1,0 +1,12 @@
+# The runtime-selected kernel arm every baseline in perf-baselines.tsv was
+# refreshed under, as detected from inside the profiled process by the `arm`
+# case in benches/dispatch.rs.
+#
+# This is a property of the CI image and the Valgrind version, not of the
+# source: Valgrind emulates the guest CPU and answers CPUID itself, so an image
+# or Valgrind upgrade can move every sentinel onto a different arm under an
+# otherwise green build. Refresh this alongside perf-baselines.tsv, never on its
+# own.
+#
+# One of `avx2+bmi2`, `avx2` or `scalar`.
+avx2+bmi2

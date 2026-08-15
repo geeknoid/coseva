@@ -1,0 +1,8 @@
+error: CsvDecode/CsvEncode cannot be derived for enums
+ --> tests/ui/fail/shape_enum.rs:6:1
+  |
+6 | / enum Choice {
+7 | |     A,
+8 | |     B,
+9 | | }
+  | |_^

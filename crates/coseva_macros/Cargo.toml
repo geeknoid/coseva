@@ -1,0 +1,32 @@
+[package]
+name = "coseva_macros"
+description = "Derive macros for coseva typed row decoding and encoding."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+readme = "../../README.md"
+keywords = ["csv", "derive", "macro"]
+categories = ["encoding"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+coseva_macros_impl.workspace = true
+syn.workspace = true
+
+[dev-dependencies]
+# UI (compile-pass/fail) tests drive the real proc-macro entry points against a
+# real `coseva`, which depends back on this crate. Cargo allows this cycle
+# because it runs only through dev-dependencies.
+coseva = { path = "../coseva", features = ["std", "derive"] }
+trybuild = "1.0"
+
+[[test]]
+name = "ui"
+harness = true
+
+[lints]
+workspace = true

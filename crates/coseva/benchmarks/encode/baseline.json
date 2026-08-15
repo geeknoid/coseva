@@ -1,0 +1,560 @@
+{
+  "absolute_threshold_percent": 10.0,
+  "benchmark": {
+    "buffer_bytes": 8192,
+    "fingerprint": "c5b493329b9de1da9bf60fa286d8ea681aaca47f30191a4622420466f6e98add",
+    "methodology": "each reported target executes both implementations in alternating order per iter_custom iteration, returns only target elapsed time to Criterion, and persists both adjacent elapsed totals; each run uses the worse ratio from its two target cases and the gate uses the minimum across independent runs",
+    "page_cache_semantics": "files are truncated per sample and not sync_all'd; timings include writes into the operating system page cache, not durability",
+    "runtime_cost": "paired execution doubles work per iteration; three independent runs cost roughly six unpaired runs",
+    "report_only_cases": {
+      "path/oversized": "target-case observations are inconsistent; preserve their recomputed minimum conservatively for reporting without using it to gate the writer/typical P2 criterion"
+    }
+  },
+  "environment_key": "ddac72b1c9fc030470e3785ea032c84a5278727b208183f8666214e140c33169",
+  "host": {
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "hostname": "mataille-devbox-1",
+    "id": "mataille-devbox-1",
+    "logical_cpus": 16,
+    "machine": "x86_64",
+    "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.43"
+  },
+  "independent_runs": 3,
+  "measurement_seconds": 5.0,
+  "metric": "paired_criterion_median_target_throughput_mib_per_second",
+  "points": {
+    "encode_wallclock/coseva/path/oversized": {
+      "bytes": 8388608,
+      "median_mib_per_second": 342.867,
+      "median_ns": 23332675.667
+    },
+    "encode_wallclock/coseva/path/typical": {
+      "bytes": 8388608,
+      "median_mib_per_second": 333.889,
+      "median_ns": 23960022.9
+    },
+    "encode_wallclock/coseva/writer/oversized": {
+      "bytes": 8388608,
+      "median_mib_per_second": 366.896,
+      "median_ns": 21804526.3
+    },
+    "encode_wallclock/coseva/writer/typical": {
+      "bytes": 8388608,
+      "median_mib_per_second": 309.209,
+      "median_ns": 25872482.9
+    },
+    "encode_wallclock/csv/path/oversized": {
+      "bytes": 8388608,
+      "median_mib_per_second": 269.805,
+      "median_ns": 29651058.5
+    },
+    "encode_wallclock/csv/path/typical": {
+      "bytes": 8388608,
+      "median_mib_per_second": 314.392,
+      "median_ns": 25445927.4
+    },
+    "encode_wallclock/csv/writer/oversized": {
+      "bytes": 8388608,
+      "median_mib_per_second": 293.845,
+      "median_ns": 27225242.66
+    },
+    "encode_wallclock/csv/writer/typical": {
+      "bytes": 8388608,
+      "median_mib_per_second": 311.164,
+      "median_ns": 25709951.8
+    }
+  },
+  "ratio_floors": {
+    "path/oversized": {
+      "blocking": false,
+      "conservative": 0.6868,
+      "conservative_statistic": "minimum",
+      "floor": null,
+      "observations": [
+        0.6868,
+        1.1357,
+        1.121
+      ],
+      "status": "report_only_below_parity"
+    },
+    "path/typical": {
+      "blocking": true,
+      "conservative": 1.0364,
+      "conservative_statistic": "minimum",
+      "floor": 1.0,
+      "observations": [
+        1.0566,
+        1.0364,
+        1.1193
+      ],
+      "status": "blocking_at_or_above_parity"
+    },
+    "writer/oversized": {
+      "blocking": true,
+      "conservative": 1.1138,
+      "conservative_statistic": "minimum",
+      "floor": 1.0,
+      "observations": [
+        1.1242,
+        1.1138,
+        1.1413
+      ],
+      "status": "blocking_at_or_above_parity"
+    },
+    "writer/typical": {
+      "blocking": true,
+      "conservative": 1.0106,
+      "conservative_statistic": "minimum",
+      "floor": 1.0,
+      "observations": [
+        1.06,
+        1.0738,
+        1.0106
+      ],
+      "status": "blocking_at_or_above_parity"
+    }
+  },
+  "runs": [
+    {
+      "index": 1,
+      "paired_evidence": {
+        "path/oversized": [
+          {
+            "coseva_ns": 3926735392,
+            "csv_ns": 2696910840,
+            "executions": 91,
+            "ratio": 0.6868073783363298,
+            "target_case": "coseva"
+          },
+          {
+            "coseva_ns": 4241539810,
+            "csv_ns": 4964351767,
+            "executions": 163,
+            "ratio": 1.1704126306432097,
+            "target_case": "csv"
+          }
+        ],
+        "path/typical": [
+          {
+            "coseva_ns": 4208573097,
+            "csv_ns": 4816299910,
+            "executions": 163,
+            "ratio": 1.1444021047022341,
+            "target_case": "coseva"
+          },
+          {
+            "coseva_ns": 4371118105,
+            "csv_ns": 4618615453,
+            "executions": 163,
+            "ratio": 1.0566210617180292,
+            "target_case": "csv"
+          }
+        ],
+        "writer/oversized": [
+          {
+            "coseva_ns": 3923489112,
+            "csv_ns": 4410607989,
+            "executions": 163,
+            "ratio": 1.1241545122452732,
+            "target_case": "coseva"
+          },
+          {
+            "coseva_ns": 3796419577,
+            "csv_ns": 5491500647,
+            "executions": 143,
+            "ratio": 1.4464946604609714,
+            "target_case": "csv"
+          }
+        ],
+        "writer/typical": [
+          {
+            "coseva_ns": 6776365595,
+            "csv_ns": 7468863026,
+            "executions": 273,
+            "ratio": 1.102193044529794,
+            "target_case": "coseva"
+          },
+          {
+            "coseva_ns": 4161405889,
+            "csv_ns": 4411024778,
+            "executions": 163,
+            "ratio": 1.0599842686962662,
+            "target_case": "csv"
+          }
+        ]
+      },
+      "point_ratios": {
+        "path/oversized": 1.329414249042628,
+        "path/typical": 0.93549008668426,
+        "writer/oversized": 1.372877130050939,
+        "writer/typical": 1.1025206074074008
+      },
+      "points": {
+        "encode_wallclock/coseva/path/oversized": {
+          "bytes": 8388608,
+          "median_mib_per_second": 342.867,
+          "median_ns": 23332675.667
+        },
+        "encode_wallclock/coseva/path/typical": {
+          "bytes": 8388608,
+          "median_mib_per_second": 296.562,
+          "median_ns": 26975843.1
+        },
+        "encode_wallclock/coseva/writer/oversized": {
+          "bytes": 8388608,
+          "median_mib_per_second": 396.329,
+          "median_ns": 20185239.1
+        },
+        "encode_wallclock/coseva/writer/typical": {
+          "bytes": 8388608,
+          "median_mib_per_second": 343.064,
+          "median_ns": 23319248.3
+        },
+        "encode_wallclock/csv/path/oversized": {
+          "bytes": 8388608,
+          "median_mib_per_second": 257.908,
+          "median_ns": 31018791.5
+        },
+        "encode_wallclock/csv/path/typical": {
+          "bytes": 8388608,
+          "median_mib_per_second": 317.012,
+          "median_ns": 25235633.8
+        },
+        "encode_wallclock/csv/writer/oversized": {
+          "bytes": 8388608,
+          "median_mib_per_second": 288.685,
+          "median_ns": 27711853.125
+        },
+        "encode_wallclock/csv/writer/typical": {
+          "bytes": 8388608,
+          "median_mib_per_second": 311.164,
+          "median_ns": 25709951.8
+        }
+      },
+      "ratios": {
+        "path/oversized": 0.6868073783363298,
+        "path/typical": 1.0566210617180292,
+        "writer/oversized": 1.1241545122452732,
+        "writer/typical": 1.0599842686962662
+      }
+    },
+    {
+      "index": 2,
+      "paired_evidence": {
+        "path/oversized": [
+          {
+            "coseva_ns": 3598778061,
+            "csv_ns": 5803869014,
+            "executions": 123,
+            "ratio": 1.6127332432351404,
+            "target_case": "coseva"
+          },
+          {
+            "coseva_ns": 4019078016,
+            "csv_ns": 4564605277,
+            "executions": 183,
+            "ratio": 1.1357344293462952,
+            "target_case": "csv"
+          }
+        ],
+        "path/typical": [
+          {
+            "coseva_ns": 4027327830,
+            "csv_ns": 4229544628,
+            "executions": 163,
+            "ratio": 1.0502111589957155,
+            "target_case": "coseva"
+          },
+          {
+            "coseva_ns": 4130235946,
+            "csv_ns": 4280496973,
+            "executions": 163,
+            "ratio": 1.0363807368306701,
+            "target_case": "csv"
+          }
+        ],
+        "writer/oversized": [
+          {
+            "coseva_ns": 3825171051,
+            "csv_ns": 4260288356,
+            "executions": 163,
+            "ratio": 1.1137510713112422,
+            "target_case": "coseva"
+          },
+          {
+            "coseva_ns": 3503785489,
+            "csv_ns": 4164282702,
+            "executions": 163,
+            "ratio": 1.1885096034199598,
+            "target_case": "csv"
+          }
+        ],
+        "writer/typical": [
+          {
+            "coseva_ns": 4288765265,
+            "csv_ns": 4605267072,
+            "executions": 163,
+            "ratio": 1.0737978852754955,
+            "target_case": "coseva"
+          },
+          {
+            "coseva_ns": 4315748273,
+            "csv_ns": 4713110418,
+            "executions": 163,
+            "ratio": 1.0920725954954231,
+            "target_case": "csv"
+          }
+        ]
+      },
+      "point_ratios": {
+        "path/oversized": 1.0532433207881964,
+        "path/typical": 1.1487888798769426,
+        "writer/oversized": 1.1167447100192218,
+        "writer/typical": 1.1344261667286677
+      },
+      "points": {
+        "encode_wallclock/coseva/path/oversized": {
+          "bytes": 8388608,
+          "median_mib_per_second": 341.227,
+          "median_ns": 23444810.833
+        },
+        "encode_wallclock/coseva/path/typical": {
+          "bytes": 8388608,
+          "median_mib_per_second": 341.502,
+          "median_ns": 23425942.2
+        },
+        "encode_wallclock/coseva/writer/oversized": {
+          "bytes": 8388608,
+          "median_mib_per_second": 366.896,
+          "median_ns": 21804526.3
+        },
+        "encode_wallclock/coseva/writer/typical": {
+          "bytes": 8388608,
+          "median_mib_per_second": 309.209,
+          "median_ns": 25872482.9
+        },
+        "encode_wallclock/csv/path/oversized": {
+          "bytes": 8388608,
+          "median_mib_per_second": 323.977,
+          "median_ns": 24693090.417
+        },
+        "encode_wallclock/csv/path/typical": {
+          "bytes": 8388608,
+          "median_mib_per_second": 297.271,
+          "median_ns": 26911461.9
+        },
+        "encode_wallclock/csv/writer/oversized": {
+          "bytes": 8388608,
+          "median_mib_per_second": 328.541,
+          "median_ns": 24350089.4
+        },
+        "encode_wallclock/csv/writer/typical": {
+          "bytes": 8388608,
+          "median_mib_per_second": 272.568,
+          "median_ns": 29350421.6
+        }
+      },
+      "ratios": {
+        "path/oversized": 1.1357344293462952,
+        "path/typical": 1.0363807368306701,
+        "writer/oversized": 1.1137510713112422,
+        "writer/typical": 1.0737978852754955
+      }
+    },
+    {
+      "index": 3,
+      "paired_evidence": {
+        "path/oversized": [
+          {
+            "coseva_ns": 4017823132,
+            "csv_ns": 4877083279,
+            "executions": 163,
+            "ratio": 1.2138621135799663,
+            "target_case": "coseva"
+          },
+          {
+            "coseva_ns": 4254814123,
+            "csv_ns": 4769658674,
+            "executions": 163,
+            "ratio": 1.12100283023339,
+            "target_case": "csv"
+          }
+        ],
+        "path/typical": [
+          {
+            "coseva_ns": 4035232109,
+            "csv_ns": 4550263552,
+            "executions": 163,
+            "ratio": 1.127633659994749,
+            "target_case": "coseva"
+          },
+          {
+            "coseva_ns": 3912476924,
+            "csv_ns": 4379324677,
+            "executions": 163,
+            "ratio": 1.1193228131612105,
+            "target_case": "csv"
+          }
+        ],
+        "writer/oversized": [
+          {
+            "coseva_ns": 4003741784,
+            "csv_ns": 4869321857,
+            "executions": 163,
+            "ratio": 1.2161927815772446,
+            "target_case": "coseva"
+          },
+          {
+            "coseva_ns": 6319199410,
+            "csv_ns": 7211836218,
+            "executions": 273,
+            "ratio": 1.1412578951991008,
+            "target_case": "csv"
+          }
+        ],
+        "writer/typical": [
+          {
+            "coseva_ns": 5099440941,
+            "csv_ns": 5153439043,
+            "executions": 163,
+            "ratio": 1.0105890238998259,
+            "target_case": "coseva"
+          },
+          {
+            "coseva_ns": 3873993893,
+            "csv_ns": 4216644944,
+            "executions": 163,
+            "ratio": 1.0884490426324995,
+            "target_case": "csv"
+          }
+        ]
+      },
+      "point_ratios": {
+        "path/oversized": 1.2842011263492725,
+        "path/typical": 1.0620159883069227,
+        "writer/oversized": 1.1580628198200178,
+        "writer/typical": 0.858779253339841
+      },
+      "points": {
+        "encode_wallclock/coseva/path/oversized": {
+          "bytes": 8388608,
+          "median_mib_per_second": 346.484,
+          "median_ns": 23089108.0
+        },
+        "encode_wallclock/coseva/path/typical": {
+          "bytes": 8388608,
+          "median_mib_per_second": 333.889,
+          "median_ns": 23960022.9
+        },
+        "encode_wallclock/coseva/writer/oversized": {
+          "bytes": 8388608,
+          "median_mib_per_second": 340.291,
+          "median_ns": 23509296.9
+        },
+        "encode_wallclock/coseva/writer/typical": {
+          "bytes": 8388608,
+          "median_mib_per_second": 294.652,
+          "median_ns": 27150716.1
+        },
+        "encode_wallclock/csv/path/oversized": {
+          "bytes": 8388608,
+          "median_mib_per_second": 269.805,
+          "median_ns": 29651058.5
+        },
+        "encode_wallclock/csv/path/typical": {
+          "bytes": 8388608,
+          "median_mib_per_second": 314.392,
+          "median_ns": 25445927.4
+        },
+        "encode_wallclock/csv/writer/oversized": {
+          "bytes": 8388608,
+          "median_mib_per_second": 293.845,
+          "median_ns": 27225242.66
+        },
+        "encode_wallclock/csv/writer/typical": {
+          "bytes": 8388608,
+          "median_mib_per_second": 343.105,
+          "median_ns": 23316471.7
+        }
+      },
+      "ratios": {
+        "path/oversized": 1.12100283023339,
+        "path/typical": 1.1193228131612105,
+        "writer/oversized": 1.1412578951991008,
+        "writer/typical": 1.0105890238998259
+      }
+    }
+  ],
+  "samples": 20,
+  "schema": 2,
+  "source": {
+    "benchmark_overlay": false,
+    "revision": "c1a0cd63ccaab0b8062eb55fe1175a6403fe2f69",
+    "runtime_tree_clean": true
+  },
+  "toolchain": {
+    "LLVM version": "22.1.6",
+    "binary": "rustc",
+    "cargo": "cargo 1.98.0-nightly (fbb61be30 2026-05-26)",
+    "commit_date": "2026-05-29",
+    "commit_hash": "6368fd52cb9f230dfb156097625993e7a8891800",
+    "host": "x86_64-unknown-linux-gnu",
+    "release": "1.98.0-nightly",
+    "version": "rustc 1.98.0-nightly (6368fd52c 2026-05-29)"
+  },
+  "warm_up_seconds": 2.0,
+  "write_oracles": {
+    "oversized": {
+      "bytes": 8388608,
+      "coseva_writer": {
+        "bytes": 8388608,
+        "calls": 128,
+        "flushes": 1
+      },
+      "csv_writer": {
+        "bytes": 8388608,
+        "calls": 1024,
+        "flushes": 1
+      },
+      "path_write_calls": null,
+      "payload_bytes": 65535,
+      "rows": 128,
+      "write_call_unit": "std::io::Write::write wrapper calls, not syscalls"
+    },
+    "typical": {
+      "bytes": 8388608,
+      "coseva_writer": {
+        "bytes": 8388608,
+        "calls": 1024,
+        "flushes": 1
+      },
+      "csv_writer": {
+        "bytes": 8388608,
+        "calls": 1024,
+        "flushes": 1
+      },
+      "path_write_calls": null,
+      "payload_bytes": 127,
+      "rows": 65536,
+      "write_call_unit": "std::io::Write::write wrapper calls, not syscalls"
+    }
+  }
+}

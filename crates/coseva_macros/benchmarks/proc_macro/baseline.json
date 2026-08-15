@@ -1,0 +1,205 @@
+{
+  "cases": {
+    "attribute_generic_decode": {
+      "baseline_ms": 114.311,
+      "median_ms": 115.167,
+      "samples_ms": [
+        110.667,
+        110.838,
+        133.1,
+        100.076,
+        121.78,
+        104.885,
+        100.097,
+        115.498,
+        116.056,
+        119.295,
+        115.167,
+        111.851,
+        126.439,
+        148.16,
+        100.405,
+        127.099,
+        97.501,
+        110.276,
+        125.177,
+        123.412,
+        101.143
+      ],
+      "spread_percent": 10.513,
+      "standard_error_percent": 1.711
+    },
+    "narrow_decode": {
+      "baseline_ms": 104.037,
+      "median_ms": 101.871,
+      "samples_ms": [
+        119.205,
+        114.512,
+        101.331,
+        94.572,
+        116.244,
+        97.644,
+        97.628,
+        93.793,
+        101.932,
+        101.607,
+        119.825,
+        91.704,
+        100.058,
+        105.521,
+        115.829,
+        101.488,
+        103.212,
+        116.015,
+        100.424,
+        107.05,
+        101.871
+      ],
+      "spread_percent": 8.74,
+      "standard_error_percent": 1.459
+    },
+    "narrow_encode": {
+      "baseline_ms": 95.429,
+      "median_ms": 92.439,
+      "samples_ms": [
+        114.703,
+        111.961,
+        100.146,
+        135.974,
+        89.648,
+        90.785,
+        106.861,
+        95.829,
+        92.252,
+        95.428,
+        91.971,
+        90.074,
+        88.573,
+        111.844,
+        132.37,
+        88.847,
+        89.15,
+        92.439,
+        89.711,
+        93.59,
+        89.311
+      ],
+      "spread_percent": 11.63,
+      "standard_error_percent": 2.009
+    },
+    "wide_decode": {
+      "baseline_ms": 176.555,
+      "median_ms": 177.03,
+      "samples_ms": [
+        166.859,
+        202.456,
+        154.794,
+        152.533,
+        176.746,
+        165.266,
+        200.816,
+        164.491,
+        187.63,
+        182.292,
+        174.799,
+        177.727,
+        212.879,
+        177.03,
+        168.424,
+        153.496,
+        159.938,
+        188.597,
+        183.543,
+        207.016,
+        181.807
+      ],
+      "spread_percent": 6.827,
+      "standard_error_percent": 1.294
+    },
+    "wide_encode": {
+      "baseline_ms": 131.778,
+      "median_ms": 130.412,
+      "samples_ms": [
+        145.055,
+        119.082,
+        133.647,
+        118.307,
+        126.154,
+        138.252,
+        125.73,
+        114.508,
+        119.689,
+        143.467,
+        130.412,
+        144.596,
+        148.84,
+        118.538,
+        125.07,
+        141.947,
+        145.909,
+        115.7,
+        129.06,
+        139.882,
+        140.721
+      ],
+      "spread_percent": 9.252,
+      "standard_error_percent": 1.783
+    }
+  },
+  "environment_key": "da48bd4e5d48008226de2c2462620855bc218cd8eb20645d03039fdad6ed9ce8",
+  "fixture": {
+    "attributes": [
+      "alias",
+      "rename",
+      "rename_all",
+      "default",
+      "skip",
+      "parse_with",
+      "format_with"
+    ],
+    "fingerprint": "14eb8e2d54c5ad41279f3c019d44868c78defb56b3bed39f000ce4911b08b02c",
+    "generic_fixture": {
+      "case": "attribute_generic_decode",
+      "const_parameters": 1,
+      "lifetime_parameters": 1,
+      "type_parameters": 2
+    },
+    "widths": {
+      "narrow": 8,
+      "wide": 128
+    }
+  },
+  "host": {
+    "affinity": [
+      0
+    ],
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "hostname": "mataille-devbox-1",
+    "id": "mataille-devbox-1",
+    "logical_cpus": 16,
+    "machine": "x86_64",
+    "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.43"
+  },
+  "metric": "20pct_trimmed_mean_downstream_clean_check_wall_ms",
+  "samples": 21,
+  "schema": 1,
+  "source": {
+    "revision": "0802128cfa1555fff66c3d78b005caa1da3299ac",
+    "tree_clean": true
+  },
+  "threshold_basis": {
+    "rule": "max(10.0, 4 * worst_case_standard_error_percent)",
+    "worst_case_standard_error_percent": 2.009
+  },
+  "threshold_percent": 10.0,
+  "toolchain": {
+    "LLVM version": "22.1.6",
+    "binary": "rustc",
+    "cargo": "cargo 1.98.0-nightly (fbb61be30 2026-05-26)",
+    "commit_date": "2026-05-29",
+    "commit_hash": "6368fd52cb9f230dfb156097625993e7a8891800",
+    "host": "x86_64-unknown-linux-gnu",
+    "release": "1.98.0-nightly",
+    "version": "rustc 1.98.0-nightly (6368fd52c 2026-05-29)"
+  }
+}

@@ -1,0 +1,587 @@
+name: CI
+
+# Required, per-pull-request continuous integration for coseva.
+#
+# `coseva` exposes nine independent, non-default feature flags (std,
+# benchmarking, derive, index, serde, compact_str, multibyte, parallel,
+# test-util — see crates/coseva/Cargo.toml). An ordinary
+# default-feature test run never touches most of the crate's integration
+# targets, and an --all-features run never proves the alloc-only or
+# minimal-feature builds still compile. The jobs below are organized so that
+# every one of those gaps is covered by a job with a stable name, without
+# multiplying the OS/Rust-version matrix past what is practical for a
+# per-pull-request gate:
+#
+#   * `test`                 — default features and --all-features, tests and
+#                               doctests, crossed
+#                               with Linux/macOS/Windows and MSRV (1.95)/
+#                               stable. This is the one job that pays for the
+#                               full OS matrix, since it is the only place
+#                               platform-specific behavior (file I/O,
+#                               path/line-ending handling) can surface.
+#   * `lint`                 — --all-features strict clippy (-D warnings) and
+#                               rustfmt --check. Lints are not platform
+#                               specific for this crate (it has no
+#                               `cfg(windows)`/`cfg(unix)`/`target_os` code at
+#                               all), so this runs once on Linux/stable.
+#   * `test-no-default`      — `coseva` with no default features (the
+#                               alloc-only surface exercised by
+#                               tests/no_std.rs), on MSRV and stable.
+#   * `test-no-default-derive` — the same alloc-only surface plus `derive`,
+#                               which exercises the derive macro's core
+#                               (non-std) code paths, on MSRV and stable.
+#   * `test-feature-subsets` — `cargo test` under `index`-only and
+#                               `parallel`-only feature sets. Both flags are
+#                               non-default, so without this job their entire
+#                               test targets run in exactly one configuration:
+#                               the all-features one.
+#   * `feature-matrix`       — every other non-redundant feature combination:
+#                               an exhaustive (un-capped) `cargo hack check
+#                               --feature-powerset` over the nine flags,
+#                               relying on cargo-hack's own dedup-by-resolved-
+#                               feature-set to drop only combinations that are
+#                               provably identical builds (see the job's
+#                               inline comment for the exact rule and
+#                               verification). Runs `cargo check`, not `cargo
+#                               test`, to stay affordable; see the job comment
+#                               for the exact trade-off this implies. Runs on
+#                               MSRV and stable.
+#   * `test-32bit`           — a 32-bit compile/test target. This uses
+#                               `i686-pc-windows-msvc` on `windows-latest`,
+#                               where 32-bit executables run natively (WOW64)
+#                               with no extra system packages, rather than
+#                               `i686-unknown-linux-gnu`, which needs
+#                               `gcc-multilib` and is comparatively more prone
+#                               to breakage on hosted Linux runners.
+#   * `miri`                 — the crate's most exercised unsafe code is the
+#                               raw-pointer structural-scan kernels in
+#                               `coseva_unsafe`, and `tests/miri_unsafe.rs`
+#                               asserts nothing about output by design, so
+#                               running it natively proves very little. Miri is
+#                               its oracle, and the target is bounded enough
+#                               (about 90 seconds) to gate on.
+#   * `coverage`             — the documented `llvm-cov` invocation with a
+#                               committed floor, so the figure `DESIGN.md`
+#                               quotes cannot silently fall.
+#   * `mutants`              — mutation testing scoped to the code the pull
+#                               request changed, which measures the thing
+#                               coverage cannot: whether any assertion would
+#                               fail if that code were wrong.
+#   * `performance`          — deterministic Callgrind sentinels from seven
+#                               hot-path suites, each checked against a
+#                               committed 2% instruction-count baseline, plus
+#                               committed peak-heap baselines and generated
+#                               performance-report freshness.
+#   * `proc-macro-compile-time` — derive expansion compile wall time, measured
+#                               A/B against the merge base on the same runner
+#                               because wall clock does not travel between
+#                               hosts the way instruction counts do.
+#   * `ci-gate`               — a single, stable required-status-check name
+#                               that depends on every job above, so branch
+#                               protection has one name to require even if the
+#                               matrixes above change shape later.
+#
+# Deliberate omissions (documented rather than silently skipped):
+#   * `test-no-default`, `test-no-default-derive` and `feature-matrix` run on
+#     Linux only, not the full OS matrix. The crate has no OS-conditional
+#     code, so the marginal value of testing every feature combination on
+#     every OS is low relative to its cost; `test` already covers the OS axis
+#     for the two ends of the feature spectrum (default and all-features).
+#   * `feature-matrix` is a `cargo check`, not `cargo test`, sweep. It proves
+#     every one of the 271 non-redundant feature combinations compiles, but
+#     does not run any test/doctest under most of them — that would roughly
+#     3x the combination count again per doctest+test-binary build and is
+#     unnecessary to catch the main risk of feature combinatorics (missing
+#     or conflicting `cfg` gates), which a compile check already surfaces.
+#     Full test execution for the combinations most likely to matter at
+#     runtime (default, all-features, no-default, no-default+derive) is
+#     covered by the `test`/`test-no-default`/`test-no-default-derive` jobs.
+#   * `test-32bit` checks one representative 32-bit target with
+#     --all-features rather than crossing 32-bit with the full feature/OS/
+#     Rust-version matrix.
+#   * Nightly Miri and Bolero campaigns are intentionally not part of this
+#     per-pull-request workflow; see scheduled.yml.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+  RUST_BACKTRACE: 1
+
+jobs:
+  test:
+    name: test (${{ matrix.os }}, ${{ matrix.rust }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        # "1.95.0" is the MSRV pinned by `rust-version` in the workspace
+        # Cargo.toml; keep every occurrence of it in this file in sync with
+        # that value. (Matrix values cannot reference the `env` context, so
+        # it is repeated rather than centralized.)
+        rust: ["1.95.0", stable]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: cargo test --workspace (default features, tests + doctests)
+        run: cargo test --workspace --locked
+
+      - name: cargo test --workspace --all-features (tests + doctests)
+        run: cargo test --workspace --all-features --locked
+
+  lint:
+    name: lint (fmt + clippy --all-features)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: cargo fmt --check
+        run: cargo fmt --all -- --check
+
+      - name: cargo clippy --workspace --all-features --all-targets -D warnings
+        run: cargo clippy --workspace --all-features --all-targets --locked -- -D warnings
+
+  test-no-default:
+    name: test-no-default (coseva, alloc-only, ${{ matrix.rust }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rust: ["1.95.0", stable]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: cargo test -p coseva --no-default-features
+        run: cargo test -p coseva --no-default-features --locked
+
+  test-no-default-derive:
+    name: test-no-default-derive (coseva, alloc+derive, ${{ matrix.rust }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rust: ["1.95.0", stable]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: cargo test -p coseva --no-default-features --features derive
+        run: cargo test -p coseva --no-default-features --features derive --locked
+
+  feature-matrix:
+    name: feature-matrix (coseva, cargo-hack exhaustive powerset, ${{ matrix.rust }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rust: ["1.95.0", stable]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+
+      # Checksum-verified prebuilt binary; avoids compiling cargo-hack from
+      # source on every run.
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-hack@0.6
+
+      - uses: Swatinem/rust-cache@v2
+
+      # Full (un-capped) --feature-powerset over all nine flags, i.e. every
+      # non-redundant subset of {std, benchmarking, derive, index, serde,
+      # compact_str, multibyte, parallel, test-util}. `default`,
+      # plain --no-default-features and --all-features are excluded because
+      # the `test`/`test-no-default`/`test-no-default-derive` jobs above
+      # already give those three their full `cargo test` treatment.
+      #
+      # "Non-redundant" here is enforced two ways, both required by the
+      # feature-implication rules in crates/coseva/Cargo.toml and neither
+      # dropping a combination that is merely inconvenient:
+      #   1. cargo-hack itself skips any generated combination whose
+      #      *resolved* active-feature set duplicates one already produced by
+      #      a smaller combination. benchmarking, index, serde and parallel
+      #      each independently declare `= [..., "std", ...]`, so e.g.
+      #      `--features std,benchmarking` resolves to the exact same active
+      #      set as `--features benchmarking` alone and is skipped, while
+      #      `--features std,derive` is kept (derive does not imply std, so
+      #      it is a genuinely distinct build) and `--features
+      #      benchmarking,index` is also kept (neither implies the other, so
+      #      it is a distinct 2-way interaction, not a std duplicate).
+      #      Verified empirically with `--print-command-list`: the raw
+      #      powerset over 9 flags (minus the three explicit exclusions
+      #      above) is 510 combinations; cargo-hack's own dedup reduces that
+      #      to exactly 271, with zero remaining std+{benchmarking,index,
+      #      serde,parallel} co-occurrences and all std+{derive,compact_str,
+      #      multibyte,test-util}-only and
+      #      implying-feature-pairs (e.g. benchmarking+index) combinations
+      #      intact. No `--exclude-features`/`--skip`/`--mutually-exclusive-
+      #      features` flags are needed (or used) for this dedup; it is
+      #      cargo-hack's default `--feature-powerset` behavior once the
+      #      `--depth` cap is removed.
+      #   2. This step runs `cargo hack check`, not `cargo hack test`, and
+      #      deliberately does NOT pass --all-targets. Plain `cargo check`
+      #      only builds the lib target, so it validates that coseva's
+      #      library source compiles under all 271 combinations without
+      #      building any [[test]]/[[bench]]/[[example]] target. This is
+      #      what keeps a genuinely exhaustive sweep affordable on every
+      #      pull request (~271 incremental `cargo check` invocations,
+      #      observed to complete in under 8 minutes total locally, most
+      #      finishing in ~1s once the shared incremental cache warms up).
+      #      Full `cargo test` (including doctests) coverage of the
+      #      representative default/all-features/no-default/
+      #      no-default+derive combinations is already provided by the
+      #      `test`, `test-no-default` and `test-no-default-derive` jobs.
+      #
+      - name: cargo hack check -p coseva --feature-powerset (exhaustive)
+        run: |
+          cargo hack check -p coseva --locked \
+            --feature-powerset \
+            --exclude-features default \
+            --exclude-no-default-features \
+            --exclude-all-features
+
+  test-32bit:
+    name: test-32bit (i686-pc-windows-msvc)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: i686-pc-windows-msvc
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: cargo test --workspace --all-features --target i686-pc-windows-msvc
+        run: cargo test --workspace --all-features --locked --target i686-pc-windows-msvc
+
+  performance:
+    name: performance (Callgrind sentinels)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+
+      # Baselines are compiler-codegen sensitive. Keep this date synchronized
+      # with crates/coseva/scripts/perf-baselines.tsv and refresh them only in
+      # a dedicated change after running perf_gate.py --refresh on this image.
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly-2026-05-30
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install Callgrind
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends valgrind
+
+      - name: Check deterministic 2% performance baselines
+        run: crates/coseva/scripts/perf_gate.py
+
+      # Bounded resident memory is a promise of the streaming front ends, and
+      # allocation counts and peak live heap are as deterministic as Ir counts.
+      - name: Check memory baselines
+        run: crates/coseva/scripts/perf_memory.rs --check
+
+      - name: Check generated performance report freshness
+        run: crates/coseva/scripts/perf_report.rs --check
+
+  proc-macro-compile-time:
+    name: proc-macro-compile-time
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly-2026-05-30
+
+      - uses: Swatinem/rust-cache@v2
+
+      # Derive expansion cost is a wall-clock quantity, so the committed
+      # absolute baseline in benchmarks/proc_macro/baseline.json is only valid
+      # on the host that recorded it. What is portable is an A/B: build the
+      # merge base and this revision on the *same* runner, interleaved sample
+      # for sample, and compare their trimmed means.
+      #
+      # Margin: with 21 samples the trimmed mean of a case carries a standard
+      # error of 2-3.5% (recorded per case in the emitted JSON), so an A/B
+      # difference has roughly 5%; 25% is a four-sigma band. It still fails
+      # hard on the regression that matters here, a derive expansion that grew
+      # by a factor.
+      - name: Check out the merge base
+        run: |
+          base="${{ github.event.pull_request.base.sha }}"
+          if [ -z "$base" ]; then base="$(git rev-parse HEAD~1)"; fi
+          echo "Comparing against $base"
+          git worktree add --detach ../coseva-base "$base"
+
+      - name: Compare derive compile time against the merge base
+        run: |
+          crates/coseva_macros/benchmarks/proc_macro/run.py \
+            --against ../coseva-base \
+            --samples 21 \
+            --threshold-percent 25 \
+            --output proc-macro-compile-time.json
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: proc-macro-compile-time
+          path: proc-macro-compile-time.json
+
+  test-feature-subsets:
+    name: test-feature-subsets (${{ matrix.features }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # `index` and `parallel` are both non-default, so without this job
+        # every test in tests/index.rs, tests/index_generate.rs and
+        # tests/parallel.rs executes in exactly one configuration: the
+        # all-features one, where every other flag is also on. A defect that
+        # needs `index` without `serde`, or `parallel` without `compact_str`,
+        # compiles clean under `feature-matrix` and is never run.
+        features: [index, parallel]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: cargo test -p coseva --features ${{ matrix.features }}
+        run: |
+          cargo test -p coseva --locked \
+            --no-default-features --features ${{ matrix.features }}
+
+  miri:
+    name: miri (unsafe kernels)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # dtolnay/rust-toolchain resolves this to a nightly that actually ships
+      # the requested component, rather than the literal latest nightly.
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly
+          components: miri
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: cargo miri setup
+        run: cargo miri setup
+
+      # `tests/miri_unsafe.rs` deliberately asserts nothing about output, which
+      # is right for a UB detector and is also why running the same corpus
+      # natively proves very little: a `set_len` past the initialized length is
+      # undefined behavior that native execution need not surface unless it
+      # happens to change a byte an assertion reads. Miri is the oracle for the
+      # raw-pointer kernels in crates/coseva_unsafe/src/record.rs, so it gates
+      # rather than merely running on a schedule. The target is bounded — three
+      # tests over a fixed corpus, about 90 seconds of interpretation — which is
+      # what makes that affordable per pull request.
+      - name: cargo miri test -p coseva --test miri_unsafe --features std
+        run: cargo miri test -p coseva --test miri_unsafe --features std
+
+      # The run above interprets the *scalar* kernels, and only those. Every
+      # vectorized path is selected by `is_x86_feature_detected!`, Miri does not
+      # execute a real `cpuid`, and so under the interpreter that macro reports
+      # the compile-time target features — which a default
+      # `x86_64-unknown-linux-gnu` build does not include `avx2` or `bmi2` in.
+      #
+      # This is measured, not assumed: a deliberate one-byte over-read in
+      # `load_avx2` (crates/coseva_unsafe/src/search.rs) passes the step above
+      # and fails this one with a Stacked Borrows violation. Since
+      # `crates/coseva_unsafe` has no unit tests for `record.rs`, that step was
+      # the only thing standing between a bounds bug in a vectorized kernel and
+      # a green build.
+      #
+      # `COSEVA_MIRI_EXPECT_AVX2` is not read by the kernels; it tells
+      # `the_dispatch_arm_is_the_one_the_job_asked_for` which arm this run is
+      # supposed to be on, so a `RUSTFLAGS` that stopped taking effect fails the
+      # job instead of silently returning it to the scalar path the step above
+      # already covers.
+      - name: cargo miri test (avx2+bmi2 arm)
+        env:
+          RUSTFLAGS: "-C target-feature=+avx2,+bmi2"
+          COSEVA_MIRI_EXPECT_AVX2: "1"
+        run: cargo miri test -p coseva --test miri_unsafe --features std
+
+  coverage:
+    name: coverage (llvm-cov ratchet)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # The `+nightly` is load-bearing: test modules and the provably
+      # unreachable helpers enumerated in crates/coseva/docs/DESIGN.md carry
+      # `#[cfg_attr(coverage_nightly, coverage(off))]`, a nightly-only
+      # attribute. On stable those regions are measured as ordinary code and
+      # the reported number is meaninglessly low.
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly
+          components: llvm-tools-preview
+
+      - uses: taiki-e/install-action@cargo-llvm-cov
+
+      - uses: Swatinem/rust-cache@v2
+
+      # The measured figure for this exact command is 96.6% (DESIGN.md's
+      # "Test coverage and what is deliberately not covered" explains the
+      # residue). The threshold sits a point below that rather than at it:
+      # coseva_unsafe dispatches over SIMD variants, so a runner whose CPU
+      # lacks AVX-512 leaves those paths unexecuted and measures lower than a
+      # developer machine that has them. This catches a module dropping out of
+      # the measured set, not tenths of a percent.
+      - name: cargo llvm-cov --workspace --all-features --fail-under-lines
+        run: |
+          cargo llvm-cov --workspace --all-features --locked \
+            --fail-under-lines 95 \
+            --lcov --output-path lcov.info
+
+      # `--all-features` compiles every `#[cfg(not(feature = "std"))]` body
+      # out, so the figure above is silent about the alloc-only surface by
+      # construction — it is not measured low, it is not measured at all. That
+      # surface is on the crate's "must not break" list, so it is reported
+      # here in the configuration where it exists.
+      #
+      # Reported, not gated. The alloc-only test population is `tests/no_std.rs`
+      # plus the unit tests that survive the feature being off, which is small
+      # enough that a percentage floor would be noise; the value is in the
+      # number existing and being visible when it moves.
+      - name: cargo llvm-cov --workspace --no-default-features (reported)
+        run: |
+          cargo llvm-cov --workspace --no-default-features --locked \
+            --summary-only | tee alloc-only-coverage.txt
+          {
+            echo "## Coverage, alloc-only (\`--no-default-features\`)"
+            echo
+            echo '```'
+            cat alloc-only-coverage.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: |
+            lcov.info
+            alloc-only-coverage.txt
+
+  mutants:
+    name: mutants (changed code only)
+    runs-on: ubuntu-latest
+    # `--in-diff` needs the merge base, and the default shallow checkout does
+    # not have it.
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: taiki-e/install-action@cargo-mutants
+
+      - uses: Swatinem/rust-cache@v2
+
+      # Coverage records that a line executed, which is a lower bound on
+      # nothing: a line executed by a test with no assertion behind it is fully
+      # covered and untested. Mutation testing is the measurement that closes
+      # that gap. The workspace generates roughly 4,700 mutants, far too many
+      # per pull request, so this job asks only whether the code *this change
+      # touched* is covered by tests that would fail if it were wrong. The full
+      # sweep runs sharded on a schedule; see .github/workflows/mutants.yml.
+      - name: Compute the diff against the merge base
+        run: |
+          git diff "origin/${{ github.base_ref || 'main' }}"...HEAD > merge-base.diff
+          wc -l merge-base.diff
+
+      - name: cargo mutants --in-diff
+        run: cargo mutants --in-diff merge-base.diff --test-tool cargo -j 2 --all-features
+
+      # The run above compiles every `#[cfg(not(feature = "std"))]` body out.
+      # `cargo-mutants` still *generates* mutants there — it rewrites source
+      # syntactically, before `cfg` is resolved — so those mutants are applied
+      # to code the compiler then discards, the suite passes, and they are
+      # reported as survivors that no test could ever have killed. The
+      # alloc-only surface is on the crate's "must not break" list, so it gets
+      # its own run in the configuration where it actually exists, and the
+      # false survivors above become real verdicts here.
+      - name: cargo mutants --in-diff (alloc-only)
+        run: cargo mutants --in-diff merge-base.diff --test-tool cargo -j 2 --no-default-features -o mutants-alloc-only.out
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mutants-in-diff
+          path: |
+            mutants.out/
+            mutants-alloc-only.out/
+
+  ci-gate:
+    name: ci-gate
+    if: always()
+    needs:
+      - test
+      - lint
+      - test-no-default
+      - test-no-default-derive
+      - test-feature-subsets
+      - feature-matrix
+      - test-32bit
+      - miri
+      - coverage
+      - mutants
+      - performance
+      - proc-macro-compile-time
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require all upstream jobs to have succeeded
+        run: |
+          if [ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" = "true" ]; then
+            echo "One or more required CI jobs did not succeed:"
+            echo '${{ toJSON(needs) }}'
+            exit 1
+          fi

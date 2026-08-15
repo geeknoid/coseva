@@ -1,0 +1,21 @@
+error[E0277]: the trait bound `NotDecodable: DecodeField<'__row>` is not satisfied
+  --> tests/ui/fail_rustc/missing_decode_field.rs:11:12
+   |
+11 |     value: NotDecodable,
+   |            ^^^^^^^^^^^^ unsatisfied trait bound
+   |
+help: the trait `DecodeField<'__row>` is not implemented for `NotDecodable`
+  --> tests/ui/fail_rustc/missing_decode_field.rs:7:1
+   |
+ 7 | struct NotDecodable;
+   | ^^^^^^^^^^^^^^^^^^^
+   = help: the following other types implement trait `DecodeField<'record>`:
+             &'record [u8]
+             &'record str
+             Option<T>
+             String
+             Vec<u8>
+             bool
+             f32
+             f64
+           and $N others

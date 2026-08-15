@@ -1,0 +1,17 @@
+[package]
+name = "coseva_unsafe"
+description = "Private low-level implementation details for coseva."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+publish = false
+
+[features]
+default = ["std"]
+std = []
+benchmarking = []
+
+[lints]
+workspace = true

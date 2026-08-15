@@ -1,0 +1,5 @@
+error: expected identifier
+ --> tests/ui/fail/attr_format_with_malformed_path.rs:7:11
+  |
+7 |     #[csv(format_with = "1 + 1")]
+  |           ^^^^^^^^^^^^^^^^^^^^^

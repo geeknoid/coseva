@@ -1,0 +1,106 @@
+name: Scheduled performance
+
+# Wall-clock gates on shared pull-request runners fail on load rather than on
+# defects. The parallel scaling and file-backed encoding comparisons therefore
+# run on a schedule and are deliberately not part of `ci-gate`.
+#
+# What it can enforce anywhere is a within-run ratio: the parallel/index
+# harnesses compare serial and parallel paths, while the encode harness compares
+# coseva and csv in paired, alternating order over identical files. The encode
+# runner performs three independent Criterion runs and gates on their minimum,
+# blocking only cases that reached parity in every baseline run. Below-parity
+# cases are explicit reports. Absolute throughput remains report-only when the
+# environment differs from the recorded host.
+
+on:
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  parallel:
+    name: parallel (speedup floor)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly-2026-05-30
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Measure and check the parallel speedup floor
+        run: |
+          crates/coseva/benchmarks/parallel/run.py \
+            --measurement-time 3 \
+            --output parallel-perf.json
+
+      - name: Measure the ordered drain's delivery tail
+        run: crates/coseva/scripts/perf_parallel_tail.rs --output parallel-tail.json
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: parallel-perf
+          path: |
+            parallel-perf.json
+            parallel-tail.json
+
+  index:
+    name: index build (speedup floor)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly-2026-05-30
+
+      - uses: Swatinem/rust-cache@v2
+
+      # Beyond the speedup floors this also checks the *routing*: that
+      # `CsvIndex::build` still reaches the builder
+      # `PARALLEL_INDEX_THRESHOLD_BYTES` says it should, at sizes either side of
+      # it. That check is what stops the constant and the code that reads it
+      # from drifting apart unnoticed, and like the floors it is a ratio, so it
+      # holds on any machine.
+      - name: Measure and check the index build speedup floor
+        run: |
+          crates/coseva/benchmarks/index/run.py \
+            --measurement-time 3 \
+            --output index-perf.json
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: index-perf
+          path: index-perf.json
+
+  encode:
+    name: file-backed encoding (blocking parity and reports)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly-2026-05-30
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Measure blocking ratios and report below-parity cases
+        run: |
+          crates/coseva/benchmarks/encode/run.py \
+            --runs 3 \
+            --measurement-time 3 \
+            --output encode-perf.json
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: encode-perf
+          path: encode-perf.json

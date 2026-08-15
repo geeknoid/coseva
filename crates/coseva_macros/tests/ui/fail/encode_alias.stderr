@@ -1,0 +1,6 @@
+error: `alias = "town"` applies to decoding only, because a column is                      encoded under a single name; use `rename` to choose it
+ --> tests/ui/fail/encode_alias.rs:8:5
+  |
+8 | /     #[csv(alias = "town")]
+9 | |     city: String,
+  | |________________^

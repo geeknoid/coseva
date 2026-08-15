@@ -1,0 +1,38 @@
+[package]
+name = "coseva_macros_impl"
+description = "Implementation of the derive macros for coseva typed row decoding and encoding."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+readme = "../../README.md"
+keywords = ["csv", "derive", "macro"]
+categories = ["encoding", "development-tools::procedural-macro-helpers"]
+
+[dependencies]
+proc-macro2.workspace = true
+quote.workspace = true
+syn.workspace = true
+
+[dev-dependencies]
+bolero.workspace = true
+# The renamed-crate UI test proves the derive's absolute `::coseva::…` paths
+# resolve when a downstream crate imports `coseva` under a different package
+# name. It has to live here rather than in `coseva_macros`, because Cargo
+# forbids depending on the same package (`coseva`) twice under two names in one
+# crate, and `coseva_macros` already has a plain `coseva` dev-dependency. This
+# crate has no other `coseva` dependency, so the alias is unambiguous. The
+# dev-dependency cycle back through `coseva` is allowed because it is dev-only.
+renamed_coseva = { package = "coseva", path = "../coseva", features = ["std", "derive"] }
+trybuild = "1.0"
+
+[[test]]
+name = "ui_renamed"
+harness = true
+
+[lints]
+workspace = true
+
+[package.metadata.docs.rs]
+all-features = true

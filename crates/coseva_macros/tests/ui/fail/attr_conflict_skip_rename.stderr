@@ -1,0 +1,5 @@
+error: `rename` conflicts with `skip`; a skipped field has no CSV column
+ --> tests/ui/fail/attr_conflict_skip_rename.rs:8:17
+  |
+8 |     #[csv(skip, rename = "kept")]
+  |                 ^^^^^^

@@ -1,0 +1,10 @@
+error[E0277]: the trait bound `T: DecodeField<'__row>` is not satisfied
+ --> tests/ui/fail_rustc/generic_decode_field_unbounded.rs:9:12
+  |
+9 |     value: T,
+  |            ^ the trait `DecodeField<'__row>` is not implemented for `T`
+  |
+help: consider restricting type parameter `T` with trait `DecodeField`
+  |
+8 | struct Row<T: coseva::encoding::DecodeField<'__row>> {
+  |             +++++++++++++++++++++++++++++++++++++++

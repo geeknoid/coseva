@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "generated_by": "cargo +nightly-2026-05-30 -Zscript crates/coseva/scripts/perf_memory.rs --refresh-baseline",
+  "rustc": "rustc 1.98.0-nightly (6368fd52c 2026-05-29)\nbinary: rustc\ncommit-hash: 6368fd52cb9f230dfb156097625993e7a8891800\ncommit-date: 2026-05-29\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.0-nightly\nLLVM version: 22.1.6",
+  "cargo": "cargo 1.98.0-nightly (fbb61be30 2026-05-26)",
+  "cases": [
+    {
+      "case": "read_owned_reused",
+      "operations": 791645,
+      "allocations": 5,
+      "allocated_bytes": 332,
+      "peak_live_bytes": 332
+    },
+    {
+      "case": "read_text_reused",
+      "operations": 791645,
+      "allocations": 5,
+      "allocated_bytes": 332,
+      "peak_live_bytes": 332
+    },
+    {
+      "case": "decode_into_narrow_reused",
+      "operations": 1000,
+      "allocations": 0,
+      "allocated_bytes": 0,
+      "peak_live_bytes": 0
+    },
+    {
+      "case": "decode_into_wide_reused",
+      "operations": 1000,
+      "allocations": 0,
+      "allocated_bytes": 0,
+      "peak_live_bytes": 0
+    },
+    {
+      "case": "write_vec_growth",
+      "operations": 791645,
+      "allocations": 20,
+      "allocated_bytes": 15728640,
+      "peak_live_bytes": 15728640
+    },
+    {
+      "case": "write_vec_builder",
+      "operations": 791645,
+      "allocations": 24,
+      "allocated_bytes": 16777256,
+      "peak_live_bytes": 16777256
+    },
+    {
+      "case": "index_build_serial",
+      "operations": 208765,
+      "allocations": 3,
+      "allocated_bytes": 3340496,
+      "peak_live_bytes": 3340496
+    },
+    {
+      "case": "index_build_parallel",
+      "operations": 791645,
+      "allocations": 1097,
+      "allocated_bytes": 30585830,
+      "peak_live_bytes": 30453248
+    },
+    {
+      "case": "parallel_fold_16mib",
+      "operations": 524288,
+      "allocations": 25,
+      "allocated_bytes": 4614,
+      "peak_live_bytes": 3944
+    },
+    {
+      "case": "parallel_fold_64mib",
+      "operations": 2097152,
+      "allocations": 25,
+      "allocated_bytes": 4614,
+      "peak_live_bytes": 3944
+    },
+    {
+      "case": "parallel_batches_16mib",
+      "operations": 524288,
+      "allocations": 184445,
+      "allocated_bytes": 31304914,
+      "peak_live_bytes": 11643348
+    },
+    {
+      "case": "parallel_batches_64mib",
+      "operations": 2097152,
+      "allocations": 307340,
+      "allocated_bytes": 38186578,
+      "peak_live_bytes": 17836905
+    },
+    {
+      "case": "read_io_streaming_refill",
+      "operations": 791645,
+      "allocations": 11,
+      "allocated_bytes": 8668,
+      "peak_live_bytes": 8668
+    },
+    {
+      "case": "write_io_drain",
+      "operations": 791645,
+      "allocations": 3,
+      "allocated_bytes": 24576,
+      "peak_live_bytes": 16384
+    },
+    {
+      "case": "read_io_outlier_reclaim",
+      "operations": 10001,
+      "allocations": 25,
+      "allocated_bytes": 3146143,
+      "peak_live_bytes": 3146143
+    },
+    {
+      "case": "push_one_byte_chunks",
+      "operations": 262161,
+      "allocations": 11,
+      "allocated_bytes": 464,
+      "peak_live_bytes": 464
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+error: `alias` conflicts with `skip`; a skipped field has no CSV column
+ --> tests/gamma_alias_span/fail/skip_multiple_aliases.rs:7:25
+  |
+7 |     #[csv(skip, alias = "first", alias = "second")]
+  |                         ^^^^^^^

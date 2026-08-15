@@ -1,0 +1,79 @@
+# cargo-mutants configuration for the coseva workspace.
+#
+# Coverage says a line ran; it says nothing about whether any assertion would
+# have noticed the line being wrong. This configuration is what turns claims
+# about test strength into a measurement: `cargo mutants` rewrites one
+# expression at a time and reports the mutants the suite fails to kill.
+#
+# The workspace generates roughly 4,700 mutants, which is far too many for a
+# per-pull-request gate. Two workflows consume this file instead:
+#
+#   * `.github/workflows/ci.yml`'s `mutants` job runs `--in-diff` against the
+#     merge base, so a pull request is asked only whether the code it touched
+#     is covered by tests that would fail if it were wrong.
+#   * `.github/workflows/mutants.yml` runs the whole set on a schedule, sharded
+#     across parallel runners, and publishes the surviving-mutant list.
+#
+# `crates/coseva/docs/TESTING.md` records the surviving-mutant baseline and the
+# reasoning for every survivor that is accepted rather than fixed.
+
+# The feature set is chosen at each call site rather than here, because there
+# is more than one that matters and a config-level `additional_cargo_args`
+# silently wins over the command line.
+#
+# The suite's strength depends on features that are off by default: `index`,
+# `parallel`, `serde` and the `test-util` oracle are where the
+# subtlest behavior lives, and a mutant inside them is unkillable if the tests
+# that would kill it are never compiled. So the primary runs pass
+# `--all-features`.
+#
+# But that configuration compiles out every `#[cfg(not(feature = "std"))]`
+# body, so no mutant is ever generated there and the alloc-only surface — which
+# is on the crate's "must not break" list — is measured by construction at
+# nothing. The workflows therefore pair each `--all-features` run with a
+# `--no-default-features` one.
+
+# A mutant that makes the parser loop forever is caught by a timeout rather
+# than by an assertion, and the parser has several loops whose termination
+# depends on an offset advancing. The default multiplier is tight enough that
+# a slow shared runner reports spurious timeouts, which read as survivors.
+timeout_multiplier = 5.0
+minimum_test_timeout = 60
+
+# Benchmarks, scripts and generated artifacts are not shipped behavior.
+exclude_globs = [
+    "crates/coseva/benches/**",
+    "crates/coseva/scripts/**",
+    "crates/coseva/benchmarks/**",
+    "crates/coseva_macros/benchmarks/**",
+]
+
+# Everything below is a site `crates/coseva/docs/DESIGN.md` §"Test coverage and
+# what is deliberately not covered" already establishes is unreachable from any
+# test on a 64-bit AVX2 host. A mutant there cannot be killed, so leaving it in
+# the report buries the survivors that are real gaps. Each entry names the
+# reason DESIGN.md gives, so an entry that stops being true becomes visible as
+# a contradiction rather than as a silent exclusion.
+exclude_re = [
+    # Invariant guards only an internal bug can trip: every public entry point
+    # establishes position before a view is taken.
+    "\\bnot_positioned\\b",
+
+    # Width conversions consolidated precisely because they are unmeasurable on
+    # a 64-bit host: widening never fails, and narrowing only fails on a 32-bit
+    # host reading an index written on a 64-bit one.
+    "\\bwiden\\b",
+    "\\bnarrow\\b",
+    "\\bwiden_offset\\b",
+    "\\bnarrow_offset\\b",
+
+    # The run-time CPU dispatch tail. No single machine can execute both arms,
+    # so one of them is dead whatever the host. The portable body is factored
+    # out as `count1_portable` and tested directly against the naive count.
+    "\\bcount1\\b",
+
+    # Overflow guards needing an input no test process can allocate: an index
+    # past `u64::MAX` bytes, and an encoded record whose size overflows `usize`.
+    "\\bHashingWriter::write\\b",
+    "\\brecord_too_large\\b",
+]

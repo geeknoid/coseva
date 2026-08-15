@@ -1,0 +1,1290 @@
+{
+  "index": {
+    "counts": [
+      {
+        "case": "build",
+        "instructions": 2317,
+        "variant": "rows_1"
+      },
+      {
+        "case": "build",
+        "instructions": 9593,
+        "variant": "rows_10"
+      },
+      {
+        "case": "build",
+        "instructions": 64548,
+        "variant": "rows_100"
+      },
+      {
+        "case": "build",
+        "instructions": 590533,
+        "variant": "rows_1000"
+      },
+      {
+        "case": "create",
+        "instructions": 15143,
+        "variant": "rows_1"
+      },
+      {
+        "case": "create",
+        "instructions": 22618,
+        "variant": "rows_10"
+      },
+      {
+        "case": "create",
+        "instructions": 89691,
+        "variant": "rows_100"
+      },
+      {
+        "case": "create",
+        "instructions": 786073,
+        "variant": "rows_1000"
+      },
+      {
+        "case": "generate",
+        "instructions": 9969,
+        "variant": "rows_1"
+      },
+      {
+        "case": "generate",
+        "instructions": 39868,
+        "variant": "rows_10"
+      },
+      {
+        "case": "generate",
+        "instructions": 331331,
+        "variant": "rows_100"
+      },
+      {
+        "case": "generate",
+        "instructions": 3294445,
+        "variant": "rows_1000"
+      },
+      {
+        "case": "reader_seek",
+        "instructions": 11793,
+        "variant": "at_first"
+      },
+      {
+        "case": "reader_seek",
+        "instructions": 11194,
+        "variant": "at_last"
+      },
+      {
+        "case": "reader_seek",
+        "instructions": 11793,
+        "variant": "at_middle"
+      },
+      {
+        "case": "seek",
+        "instructions": 31976,
+        "variant": "at_first"
+      },
+      {
+        "case": "seek",
+        "instructions": 32119,
+        "variant": "at_last"
+      },
+      {
+        "case": "seek",
+        "instructions": 31976,
+        "variant": "at_middle"
+      },
+      {
+        "case": "bound_seek",
+        "instructions": 1769,
+        "variant": "rows_1"
+      },
+      {
+        "case": "bound_seek",
+        "instructions": 1852,
+        "variant": "rows_10"
+      },
+      {
+        "case": "bound_seek",
+        "instructions": 1816,
+        "variant": "rows_100"
+      },
+      {
+        "case": "bound_seek",
+        "instructions": 1735,
+        "variant": "rows_1000"
+      },
+      {
+        "case": "seek_by_size",
+        "instructions": 1887,
+        "variant": "rows_1"
+      },
+      {
+        "case": "seek_by_size",
+        "instructions": 2334,
+        "variant": "rows_10"
+      },
+      {
+        "case": "seek_by_size",
+        "instructions": 5047,
+        "variant": "rows_100"
+      },
+      {
+        "case": "seek_by_size",
+        "instructions": 32119,
+        "variant": "rows_1000"
+      }
+    ],
+    "evidence": {
+      "command": "cargo bench -p coseva --features std,index,derive --bench index",
+      "host": {
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
+        "hostname": "mataille-devbox-1",
+        "logical_cpus": 16,
+        "machine": "x86_64",
+        "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.43"
+      },
+      "source": {
+        "revision": "67f42cd94d680a4c09ff96151d01d19536e2fdcf",
+        "tree_clean": true
+      },
+      "toolchain": {
+        "LLVM version": "22.1.7",
+        "binary": "rustc",
+        "cargo": "cargo 1.98.0-nightly (598ab48ec 2026-06-17)",
+        "commit_date": "2026-06-19",
+        "commit_hash": "f428d123ab0ea5431ec4256ff8838b9342866446",
+        "host": "x86_64-unknown-linux-gnu",
+        "release": "1.98.0-nightly",
+        "version": "rustc 1.98.0-nightly (f428d123a 2026-06-19)"
+      }
+    }
+  },
+  "memory": {
+    "cases": [
+      {
+        "allocated_bytes": 332,
+        "allocations": 5,
+        "case": "read_owned_reused",
+        "operations": 791645,
+        "peak_live_bytes": 332
+      },
+      {
+        "allocated_bytes": 0,
+        "allocations": 0,
+        "case": "decode_into_narrow_reused",
+        "operations": 1000,
+        "peak_live_bytes": 0
+      },
+      {
+        "allocated_bytes": 0,
+        "allocations": 0,
+        "case": "decode_into_wide_reused",
+        "operations": 1000,
+        "peak_live_bytes": 0
+      },
+      {
+        "allocated_bytes": 15728640,
+        "allocations": 20,
+        "case": "write_vec_growth",
+        "operations": 791645,
+        "peak_live_bytes": 15728640
+      },
+      {
+        "allocated_bytes": 12666576,
+        "allocations": 3,
+        "case": "index_build",
+        "operations": 791645,
+        "peak_live_bytes": 12666576
+      },
+      {
+        "allocated_bytes": 8668,
+        "allocations": 11,
+        "case": "read_io_streaming_refill",
+        "operations": 791645,
+        "peak_live_bytes": 8668
+      },
+      {
+        "allocated_bytes": 24576,
+        "allocations": 3,
+        "case": "write_io_drain",
+        "operations": 791645,
+        "peak_live_bytes": 16384
+      },
+      {
+        "allocated_bytes": 3146143,
+        "allocations": 25,
+        "case": "read_io_outlier_reclaim",
+        "operations": 10001,
+        "peak_live_bytes": 3146143
+      },
+      {
+        "allocated_bytes": 464,
+        "allocations": 11,
+        "case": "push_one_byte_chunks",
+        "operations": 262161,
+        "peak_live_bytes": 464
+      }
+    ],
+    "evidence": {
+      "command": "cargo +nightly-2026-05-30 -Zscript crates/coseva/scripts/perf_memory.rs --output target/perf-report/memory.json",
+      "host": {
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
+        "hostname": "mataille-devbox-1",
+        "logical_cpus": 16
+      },
+      "source": {
+        "revision": "67f42cd94d680a4c09ff96151d01d19536e2fdcf",
+        "tree_clean": true
+      },
+      "toolchain": {
+        "cargo": "cargo 1.98.0-nightly (598ab48ec 2026-06-17)",
+        "rustc": "rustc 1.98.0-nightly (f428d123a 2026-06-19)\nbinary: rustc\ncommit-hash: f428d123ab0ea5431ec4256ff8838b9342866446\ncommit-date: 2026-06-19\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.0-nightly\nLLVM version: 22.1.7"
+      }
+    },
+    "metric": "allocator_call_count_cumulative_heap_growth_bytes_and_peak_additional_live_heap_bytes"
+  },
+  "parallel": {
+    "evidence": {
+      "command": "cargo bench -p coseva --features std,parallel --bench parallel -- --warm-up-time 1 --measurement-time 3 --sample-size 20",
+      "host": {
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
+        "hostname": "mataille-devbox-1",
+        "logical_cpus": 16,
+        "machine": "x86_64",
+        "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.43"
+      },
+      "source": {
+        "revision": "67f42cd94d680a4c09ff96151d01d19536e2fdcf",
+        "tree_clean": true
+      },
+      "toolchain": {
+        "LLVM version": "22.1.7",
+        "binary": "rustc",
+        "cargo": "cargo 1.98.0-nightly (598ab48ec 2026-06-17)",
+        "commit_date": "2026-06-19",
+        "commit_hash": "f428d123ab0ea5431ec4256ff8838b9342866446",
+        "host": "x86_64-unknown-linux-gnu",
+        "release": "1.98.0-nightly",
+        "version": "rustc 1.98.0-nightly (f428d123a 2026-06-19)"
+      }
+    },
+    "points": [
+      {
+        "bytes": 16777219,
+        "id": "parallel/fold/threads-2/16MiB",
+        "median_ns": 13388597.9375
+      },
+      {
+        "bytes": 33554435,
+        "id": "parallel/fold/threads-2/32MiB",
+        "median_ns": 27424289.638888888
+      },
+      {
+        "bytes": 67108883,
+        "id": "parallel/fold/threads-2/64MiB",
+        "median_ns": 51762384.83333333
+      },
+      {
+        "bytes": 8388611,
+        "id": "parallel/fold/threads-2/8MiB",
+        "median_ns": 7033581.292735043
+      },
+      {
+        "bytes": 16777219,
+        "id": "parallel/fold/threads-4/16MiB",
+        "median_ns": 9036391.236111112
+      },
+      {
+        "bytes": 33554435,
+        "id": "parallel/fold/threads-4/32MiB",
+        "median_ns": 18568509.068627454
+      },
+      {
+        "bytes": 67108883,
+        "id": "parallel/fold/threads-4/64MiB",
+        "median_ns": 35755579.400000006
+      },
+      {
+        "bytes": 8388611,
+        "id": "parallel/fold/threads-4/8MiB",
+        "median_ns": 5306297.994318182
+      },
+      {
+        "bytes": 16777219,
+        "id": "parallel/fold/threads-8/16MiB",
+        "median_ns": 8355689.667857143
+      },
+      {
+        "bytes": 33554435,
+        "id": "parallel/fold/threads-8/32MiB",
+        "median_ns": 15328197.93125
+      },
+      {
+        "bytes": 67108883,
+        "id": "parallel/fold/threads-8/64MiB",
+        "median_ns": 28653120.9
+      },
+      {
+        "bytes": 8388611,
+        "id": "parallel/fold/threads-8/8MiB",
+        "median_ns": 4822805.610294118
+      },
+      {
+        "bytes": 16777219,
+        "id": "parallel/fold/threads-auto/16MiB",
+        "median_ns": 8288011.625
+      },
+      {
+        "bytes": 33554435,
+        "id": "parallel/fold/threads-auto/32MiB",
+        "median_ns": 15922133.06722689
+      },
+      {
+        "bytes": 67108883,
+        "id": "parallel/fold/threads-auto/64MiB",
+        "median_ns": 28273594.85
+      },
+      {
+        "bytes": 8388611,
+        "id": "parallel/fold/threads-auto/8MiB",
+        "median_ns": 5210220.595238095
+      },
+      {
+        "bytes": 16777219,
+        "id": "parallel/owned/batch-16384/threads-auto/16MiB",
+        "median_ns": 25107764.3
+      },
+      {
+        "bytes": 33554435,
+        "id": "parallel/owned/batch-16384/threads-auto/32MiB",
+        "median_ns": 49454259.375
+      },
+      {
+        "bytes": 67108883,
+        "id": "parallel/owned/batch-16384/threads-auto/64MiB",
+        "median_ns": 78598089.75
+      },
+      {
+        "bytes": 8388611,
+        "id": "parallel/owned/batch-16384/threads-auto/8MiB",
+        "median_ns": 20550817.235714287
+      },
+      {
+        "bytes": 16777219,
+        "id": "parallel/owned/batch-256/threads-auto/16MiB",
+        "median_ns": 139295920.75
+      },
+      {
+        "bytes": 33554435,
+        "id": "parallel/owned/batch-256/threads-auto/32MiB",
+        "median_ns": 318177481.0
+      },
+      {
+        "bytes": 67108883,
+        "id": "parallel/owned/batch-256/threads-auto/64MiB",
+        "median_ns": 613377525.0
+      },
+      {
+        "bytes": 8388611,
+        "id": "parallel/owned/batch-256/threads-auto/8MiB",
+        "median_ns": 55611645.0
+      },
+      {
+        "bytes": 16777219,
+        "id": "parallel/owned/batch-32/threads-auto/16MiB",
+        "median_ns": 372821253.0
+      },
+      {
+        "bytes": 33554435,
+        "id": "parallel/owned/batch-32/threads-auto/32MiB",
+        "median_ns": 692872801.0
+      },
+      {
+        "bytes": 67108883,
+        "id": "parallel/owned/batch-32/threads-auto/64MiB",
+        "median_ns": 1329022035.0
+      },
+      {
+        "bytes": 8388611,
+        "id": "parallel/owned/batch-32/threads-auto/8MiB",
+        "median_ns": 215532520.0
+      },
+      {
+        "bytes": 16777219,
+        "id": "parallel/owned/threads-2/16MiB",
+        "median_ns": 61583225.33333333
+      },
+      {
+        "bytes": 33554435,
+        "id": "parallel/owned/threads-2/32MiB",
+        "median_ns": 142341246.0
+      },
+      {
+        "bytes": 67108883,
+        "id": "parallel/owned/threads-2/64MiB",
+        "median_ns": 310336262.5
+      },
+      {
+        "bytes": 8388611,
+        "id": "parallel/owned/threads-2/8MiB",
+        "median_ns": 35291969.900000006
+      },
+      {
+        "bytes": 16777219,
+        "id": "parallel/owned/threads-4/16MiB",
+        "median_ns": 38351980.875
+      },
+      {
+        "bytes": 33554435,
+        "id": "parallel/owned/threads-4/32MiB",
+        "median_ns": 75500566.5
+      },
+      {
+        "bytes": 67108883,
+        "id": "parallel/owned/threads-4/64MiB",
+        "median_ns": 255254938.0
+      },
+      {
+        "bytes": 8388611,
+        "id": "parallel/owned/threads-4/8MiB",
+        "median_ns": 21807029.375
+      },
+      {
+        "bytes": 16777219,
+        "id": "parallel/owned/threads-8/16MiB",
+        "median_ns": 27688379.416666664
+      },
+      {
+        "bytes": 33554435,
+        "id": "parallel/owned/threads-8/32MiB",
+        "median_ns": 46797878.25
+      },
+      {
+        "bytes": 67108883,
+        "id": "parallel/owned/threads-8/64MiB",
+        "median_ns": 96479802.0
+      },
+      {
+        "bytes": 8388611,
+        "id": "parallel/owned/threads-8/8MiB",
+        "median_ns": 16420032.15225564
+      },
+      {
+        "bytes": 16777219,
+        "id": "parallel/owned/threads-auto/16MiB",
+        "median_ns": 25724200.54120879
+      },
+      {
+        "bytes": 33554435,
+        "id": "parallel/owned/threads-auto/32MiB",
+        "median_ns": 53233531.625
+      },
+      {
+        "bytes": 67108883,
+        "id": "parallel/owned/threads-auto/64MiB",
+        "median_ns": 68531878.0
+      },
+      {
+        "bytes": 8388611,
+        "id": "parallel/owned/threads-auto/8MiB",
+        "median_ns": 17414676.058333334
+      },
+      {
+        "bytes": 1048589,
+        "id": "parallel/serial/1024",
+        "median_ns": 5307962.3702380955
+      },
+      {
+        "bytes": 16777219,
+        "id": "parallel/serial/16384",
+        "median_ns": 83137777.5
+      },
+      {
+        "bytes": 262161,
+        "id": "parallel/serial/256",
+        "median_ns": 1455661.5287698414
+      },
+      {
+        "bytes": 4194306,
+        "id": "parallel/serial/4096",
+        "median_ns": 19475214.6875
+      },
+      {
+        "bytes": 65545,
+        "id": "parallel/serial/64",
+        "median_ns": 346373.43427230045
+      },
+      {
+        "bytes": 67108883,
+        "id": "parallel/serial/65536",
+        "median_ns": 314869085.5
+      },
+      {
+        "bytes": 16777219,
+        "id": "parallel/serial/borrowed/16MiB",
+        "median_ns": 18570921.49122807
+      },
+      {
+        "bytes": 33554435,
+        "id": "parallel/serial/borrowed/32MiB",
+        "median_ns": 32197941.4
+      },
+      {
+        "bytes": 67108883,
+        "id": "parallel/serial/borrowed/64MiB",
+        "median_ns": 65072398.666666664
+      },
+      {
+        "bytes": 8388611,
+        "id": "parallel/serial/borrowed/8MiB",
+        "median_ns": 9113216.647058822
+      },
+      {
+        "bytes": 16777219,
+        "id": "parallel/serial/owned/16MiB",
+        "median_ns": 38488859.599999994
+      },
+      {
+        "bytes": 33554435,
+        "id": "parallel/serial/owned/32MiB",
+        "median_ns": 68502236.5
+      },
+      {
+        "bytes": 67108883,
+        "id": "parallel/serial/owned/64MiB",
+        "median_ns": 139167394.75
+      },
+      {
+        "bytes": 8388611,
+        "id": "parallel/serial/owned/8MiB",
+        "median_ns": 19589419.373355262
+      }
+    ]
+  },
+  "proc_macro": {
+    "cases": [
+      {
+        "case": "attribute_generic_decode",
+        "milliseconds": 114.311
+      },
+      {
+        "case": "narrow_decode",
+        "milliseconds": 104.037
+      },
+      {
+        "case": "narrow_encode",
+        "milliseconds": 95.429
+      },
+      {
+        "case": "wide_decode",
+        "milliseconds": 176.555
+      },
+      {
+        "case": "wide_encode",
+        "milliseconds": 131.778
+      }
+    ],
+    "evidence": {
+      "command": "python3 crates/coseva_macros/benchmarks/proc_macro/run.py --samples 21 --host-id mataille-devbox-1 --cpu 0 --write-baseline --baseline crates/coseva_macros/benchmarks/proc_macro/baseline.json",
+      "host": {
+        "affinity": [
+          0
+        ],
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
+        "hostname": "mataille-devbox-1",
+        "id": "mataille-devbox-1",
+        "logical_cpus": 16,
+        "machine": "x86_64",
+        "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.43"
+      },
+      "source": {
+        "revision": "0802128cfa1555fff66c3d78b005caa1da3299ac",
+        "tree_clean": true
+      },
+      "toolchain": {
+        "LLVM version": "22.1.6",
+        "binary": "rustc",
+        "cargo": "cargo 1.98.0-nightly (fbb61be30 2026-05-26)",
+        "commit_date": "2026-05-29",
+        "commit_hash": "6368fd52cb9f230dfb156097625993e7a8891800",
+        "host": "x86_64-unknown-linux-gnu",
+        "release": "1.98.0-nightly",
+        "version": "rustc 1.98.0-nightly (6368fd52c 2026-05-29)"
+      }
+    },
+    "metric": "20pct_trimmed_mean_downstream_clean_check_wall_ms",
+    "samples": 21
+  },
+  "read": {
+    "counts": [
+      {
+        "document": "metrics",
+        "function": "decoded_io",
+        "instructions": 5103852
+      },
+      {
+        "document": "prose",
+        "function": "decoded_io",
+        "instructions": 1152076
+      },
+      {
+        "document": "quoted",
+        "function": "decoded_io",
+        "instructions": 5080014
+      },
+      {
+        "document": "spreadsheet",
+        "function": "decoded_io",
+        "instructions": 7147867
+      },
+      {
+        "document": "wide",
+        "function": "decoded_io",
+        "instructions": 2056106
+      },
+      {
+        "document": "metrics",
+        "function": "decoded_push",
+        "instructions": 4694197
+      },
+      {
+        "document": "prose",
+        "function": "decoded_push",
+        "instructions": 848966
+      },
+      {
+        "document": "quoted",
+        "function": "decoded_push",
+        "instructions": 4716180
+      },
+      {
+        "document": "spreadsheet",
+        "function": "decoded_push",
+        "instructions": 6743586
+      },
+      {
+        "document": "wide",
+        "function": "decoded_push",
+        "instructions": 1532587
+      },
+      {
+        "document": "metrics",
+        "function": "decoded_slice",
+        "instructions": 3902028
+      },
+      {
+        "document": "prose",
+        "function": "decoded_slice",
+        "instructions": 616638
+      },
+      {
+        "document": "quoted",
+        "function": "decoded_slice",
+        "instructions": 4152000
+      },
+      {
+        "document": "spreadsheet",
+        "function": "decoded_slice",
+        "instructions": 5969045
+      },
+      {
+        "document": "wide",
+        "function": "decoded_slice",
+        "instructions": 1482474
+      },
+      {
+        "document": "metrics",
+        "function": "deserialized_csv",
+        "instructions": 10229569
+      },
+      {
+        "document": "prose",
+        "function": "deserialized_csv",
+        "instructions": 3215209
+      },
+      {
+        "document": "quoted",
+        "function": "deserialized_csv",
+        "instructions": 6316078
+      },
+      {
+        "document": "spreadsheet",
+        "function": "deserialized_csv",
+        "instructions": 8879322
+      },
+      {
+        "document": "wide",
+        "function": "deserialized_csv",
+        "instructions": 9558773
+      },
+      {
+        "document": "metrics",
+        "function": "deserialized_io",
+        "instructions": 6624875
+      },
+      {
+        "document": "prose",
+        "function": "deserialized_io",
+        "instructions": 1263085
+      },
+      {
+        "document": "quoted",
+        "function": "deserialized_io",
+        "instructions": 5785088
+      },
+      {
+        "document": "spreadsheet",
+        "function": "deserialized_io",
+        "instructions": 8317154
+      },
+      {
+        "document": "wide",
+        "function": "deserialized_io",
+        "instructions": 3479345
+      },
+      {
+        "document": "metrics",
+        "function": "deserialized_push",
+        "instructions": 6206199
+      },
+      {
+        "document": "prose",
+        "function": "deserialized_push",
+        "instructions": 953276
+      },
+      {
+        "document": "quoted",
+        "function": "deserialized_push",
+        "instructions": 5413349
+      },
+      {
+        "document": "spreadsheet",
+        "function": "deserialized_push",
+        "instructions": 7903852
+      },
+      {
+        "document": "wide",
+        "function": "deserialized_push",
+        "instructions": 2760103
+      },
+      {
+        "document": "metrics",
+        "function": "deserialized_slice",
+        "instructions": 5446338
+      },
+      {
+        "document": "prose",
+        "function": "deserialized_slice",
+        "instructions": 723596
+      },
+      {
+        "document": "quoted",
+        "function": "deserialized_slice",
+        "instructions": 4865365
+      },
+      {
+        "document": "spreadsheet",
+        "function": "deserialized_slice",
+        "instructions": 7154095
+      },
+      {
+        "document": "wide",
+        "function": "deserialized_slice",
+        "instructions": 2712010
+      },
+      {
+        "document": "metrics",
+        "function": "record_io",
+        "instructions": 4005597
+      },
+      {
+        "document": "prose",
+        "function": "record_io",
+        "instructions": 1050761
+      },
+      {
+        "document": "quoted",
+        "function": "record_io",
+        "instructions": 4460314
+      },
+      {
+        "document": "spreadsheet",
+        "function": "record_io",
+        "instructions": 6305437
+      },
+      {
+        "document": "wide",
+        "function": "record_io",
+        "instructions": 2340368
+      },
+      {
+        "document": "metrics",
+        "function": "record_push",
+        "instructions": 3595970
+      },
+      {
+        "document": "prose",
+        "function": "record_push",
+        "instructions": 747679
+      },
+      {
+        "document": "quoted",
+        "function": "record_push",
+        "instructions": 4096508
+      },
+      {
+        "document": "spreadsheet",
+        "function": "record_push",
+        "instructions": 5901184
+      },
+      {
+        "document": "wide",
+        "function": "record_push",
+        "instructions": 1816877
+      },
+      {
+        "document": "metrics",
+        "function": "record_slice",
+        "instructions": 2844161
+      },
+      {
+        "document": "prose",
+        "function": "record_slice",
+        "instructions": 518636
+      },
+      {
+        "document": "quoted",
+        "function": "record_slice",
+        "instructions": 3548499
+      },
+      {
+        "document": "spreadsheet",
+        "function": "record_slice",
+        "instructions": 5157598
+      },
+      {
+        "document": "wide",
+        "function": "record_slice",
+        "instructions": 1768759
+      },
+      {
+        "document": "metrics",
+        "function": "text_record_csv",
+        "instructions": 7159521
+      },
+      {
+        "document": "prose",
+        "function": "text_record_csv",
+        "instructions": 3023089
+      },
+      {
+        "document": "quoted",
+        "function": "text_record_csv",
+        "instructions": 4974978
+      },
+      {
+        "document": "spreadsheet",
+        "function": "text_record_csv",
+        "instructions": 6560986
+      },
+      {
+        "document": "wide",
+        "function": "text_record_csv",
+        "instructions": 6696779
+      },
+      {
+        "document": "metrics",
+        "function": "text_record_io",
+        "instructions": 6428849
+      },
+      {
+        "document": "prose",
+        "function": "text_record_io",
+        "instructions": 1239167
+      },
+      {
+        "document": "quoted",
+        "function": "text_record_io",
+        "instructions": 4730530
+      },
+      {
+        "document": "spreadsheet",
+        "function": "text_record_io",
+        "instructions": 6672075
+      },
+      {
+        "document": "wide",
+        "function": "text_record_io",
+        "instructions": 4184688
+      },
+      {
+        "document": "metrics",
+        "function": "text_record_push",
+        "instructions": 6159447
+      },
+      {
+        "document": "prose",
+        "function": "text_record_push",
+        "instructions": 937649
+      },
+      {
+        "document": "quoted",
+        "function": "text_record_push",
+        "instructions": 4359534
+      },
+      {
+        "document": "spreadsheet",
+        "function": "text_record_push",
+        "instructions": 6349320
+      },
+      {
+        "document": "wide",
+        "function": "text_record_push",
+        "instructions": 3637030
+      },
+      {
+        "document": "metrics",
+        "function": "text_record_slice",
+        "instructions": 4626203
+      },
+      {
+        "document": "prose",
+        "function": "text_record_slice",
+        "instructions": 657103
+      },
+      {
+        "document": "quoted",
+        "function": "text_record_slice",
+        "instructions": 3507503
+      },
+      {
+        "document": "spreadsheet",
+        "function": "text_record_slice",
+        "instructions": 5132379
+      },
+      {
+        "document": "wide",
+        "function": "text_record_slice",
+        "instructions": 3378634
+      },
+      {
+        "document": "metrics",
+        "function": "byte_record_push",
+        "instructions": 5553589
+      },
+      {
+        "document": "prose",
+        "function": "byte_record_push",
+        "instructions": 786270
+      },
+      {
+        "document": "quoted",
+        "function": "byte_record_push",
+        "instructions": 4004462
+      },
+      {
+        "document": "spreadsheet",
+        "function": "byte_record_push",
+        "instructions": 5873330
+      },
+      {
+        "document": "wide",
+        "function": "byte_record_push",
+        "instructions": 3459404
+      },
+      {
+        "document": "metrics",
+        "function": "byte_record_slice",
+        "instructions": 4351585
+      },
+      {
+        "document": "prose",
+        "function": "byte_record_slice",
+        "instructions": 532949
+      },
+      {
+        "document": "quoted",
+        "function": "byte_record_slice",
+        "instructions": 3318523
+      },
+      {
+        "document": "spreadsheet",
+        "function": "byte_record_slice",
+        "instructions": 4910508
+      },
+      {
+        "document": "wide",
+        "function": "byte_record_slice",
+        "instructions": 3221796
+      },
+      {
+        "document": "metrics",
+        "function": "byte_record_csv",
+        "instructions": 6618600
+      },
+      {
+        "document": "prose",
+        "function": "byte_record_csv",
+        "instructions": 2839158
+      },
+      {
+        "document": "quoted",
+        "function": "byte_record_csv",
+        "instructions": 4617774
+      },
+      {
+        "document": "spreadsheet",
+        "function": "byte_record_csv",
+        "instructions": 6117013
+      },
+      {
+        "document": "wide",
+        "function": "byte_record_csv",
+        "instructions": 6627414
+      },
+      {
+        "document": "metrics",
+        "function": "byte_record_io",
+        "instructions": 5059842
+      },
+      {
+        "document": "prose",
+        "function": "byte_record_io",
+        "instructions": 1000127
+      },
+      {
+        "document": "quoted",
+        "function": "byte_record_io",
+        "instructions": 3965342
+      },
+      {
+        "document": "spreadsheet",
+        "function": "byte_record_io",
+        "instructions": 5639289
+      },
+      {
+        "document": "wide",
+        "function": "byte_record_io",
+        "instructions": 3953512
+      }
+    ],
+    "documents": [
+      {
+        "bytes": 253954,
+        "name": "metrics",
+        "records": 8077
+      },
+      {
+        "bytes": 254136,
+        "name": "wide",
+        "records": 505
+      },
+      {
+        "bytes": 254019,
+        "name": "quoted",
+        "records": 4049
+      },
+      {
+        "bytes": 254075,
+        "name": "prose",
+        "records": 662
+      },
+      {
+        "bytes": 253953,
+        "name": "spreadsheet",
+        "records": 6196
+      }
+    ],
+    "evidence": {
+      "command": "cargo bench -p coseva --features std,derive,serde --bench matrix && cargo bench -p coseva --features std,derive,serde --bench matrix_byte_record && cargo bench -p coseva --features std,derive,serde --bench matrix_byte_record_io",
+      "host": {
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
+        "hostname": "mataille-devbox-1",
+        "logical_cpus": 16,
+        "machine": "x86_64",
+        "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.43"
+      },
+      "source": {
+        "revision": "67f42cd94d680a4c09ff96151d01d19536e2fdcf",
+        "tree_clean": true
+      },
+      "toolchain": {
+        "LLVM version": "22.1.7",
+        "binary": "rustc",
+        "cargo": "cargo 1.98.0-nightly (598ab48ec 2026-06-17)",
+        "commit_date": "2026-06-19",
+        "commit_hash": "f428d123ab0ea5431ec4256ff8838b9342866446",
+        "host": "x86_64-unknown-linux-gnu",
+        "release": "1.98.0-nightly",
+        "version": "rustc 1.98.0-nightly (f428d123a 2026-06-19)"
+      }
+    }
+  },
+  "schema": 1,
+  "write": {
+    "counts": [
+      {
+        "case": "csv_serialize",
+        "instructions": 2484,
+        "variant": "rows_1"
+      },
+      {
+        "case": "csv_serialize",
+        "instructions": 21539,
+        "variant": "rows_10"
+      },
+      {
+        "case": "csv_serialize",
+        "instructions": 211871,
+        "variant": "rows_100"
+      },
+      {
+        "case": "csv_serialize",
+        "instructions": 2115906,
+        "variant": "rows_1000"
+      },
+      {
+        "case": "csv_writer",
+        "instructions": 1551,
+        "variant": "rows_1"
+      },
+      {
+        "case": "csv_writer",
+        "instructions": 12218,
+        "variant": "rows_10"
+      },
+      {
+        "case": "csv_writer",
+        "instructions": 118670,
+        "variant": "rows_100"
+      },
+      {
+        "case": "csv_writer",
+        "instructions": 1183913,
+        "variant": "rows_1000"
+      },
+      {
+        "case": "io",
+        "instructions": 1051,
+        "variant": "rows_1"
+      },
+      {
+        "case": "io",
+        "instructions": 7416,
+        "variant": "rows_10"
+      },
+      {
+        "case": "io",
+        "instructions": 70848,
+        "variant": "rows_100"
+      },
+      {
+        "case": "io",
+        "instructions": 751003,
+        "variant": "rows_1000"
+      },
+      {
+        "case": "push",
+        "instructions": 1142,
+        "variant": "rows_1"
+      },
+      {
+        "case": "push",
+        "instructions": 8954,
+        "variant": "rows_10"
+      },
+      {
+        "case": "push",
+        "instructions": 81890,
+        "variant": "rows_100"
+      },
+      {
+        "case": "push",
+        "instructions": 805748,
+        "variant": "rows_1000"
+      },
+      {
+        "case": "vec",
+        "instructions": 889,
+        "variant": "rows_1"
+      },
+      {
+        "case": "vec",
+        "instructions": 8080,
+        "variant": "rows_10"
+      },
+      {
+        "case": "vec",
+        "instructions": 79990,
+        "variant": "rows_100"
+      },
+      {
+        "case": "vec",
+        "instructions": 799090,
+        "variant": "rows_1000"
+      },
+      {
+        "case": "vec_encode",
+        "instructions": 1705,
+        "variant": "rows_1"
+      },
+      {
+        "case": "vec_encode",
+        "instructions": 16258,
+        "variant": "rows_10"
+      },
+      {
+        "case": "vec_encode",
+        "instructions": 161788,
+        "variant": "rows_100"
+      },
+      {
+        "case": "vec_encode",
+        "instructions": 1617088,
+        "variant": "rows_1000"
+      },
+      {
+        "case": "vec_serialize",
+        "instructions": 1959,
+        "variant": "rows_1"
+      },
+      {
+        "case": "vec_serialize",
+        "instructions": 18789,
+        "variant": "rows_10"
+      },
+      {
+        "case": "vec_serialize",
+        "instructions": 187089,
+        "variant": "rows_100"
+      },
+      {
+        "case": "vec_serialize",
+        "instructions": 1870089,
+        "variant": "rows_1000"
+      }
+    ],
+    "evidence": {
+      "command": "cargo bench -p coseva --features std,derive,serde --bench encode",
+      "host": {
+        "cpu_model": "AMD EPYC 7763 64-Core Processor",
+        "hostname": "mataille-devbox-1",
+        "logical_cpus": 16,
+        "machine": "x86_64",
+        "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.43"
+      },
+      "source": {
+        "revision": "67f42cd94d680a4c09ff96151d01d19536e2fdcf",
+        "tree_clean": true
+      },
+      "toolchain": {
+        "LLVM version": "22.1.7",
+        "binary": "rustc",
+        "cargo": "cargo 1.98.0-nightly (598ab48ec 2026-06-17)",
+        "commit_date": "2026-06-19",
+        "commit_hash": "f428d123ab0ea5431ec4256ff8838b9342866446",
+        "host": "x86_64-unknown-linux-gnu",
+        "release": "1.98.0-nightly",
+        "version": "rustc 1.98.0-nightly (f428d123a 2026-06-19)"
+      }
+    }
+  }
+}

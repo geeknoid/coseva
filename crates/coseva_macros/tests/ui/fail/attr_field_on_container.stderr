@@ -1,0 +1,5 @@
+error: unsupported csv container attribute
+ --> tests/ui/fail/attr_field_on_container.rs:7:7
+  |
+7 | #[csv(skip)]
+  |       ^^^^

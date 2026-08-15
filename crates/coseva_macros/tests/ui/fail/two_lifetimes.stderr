@@ -1,0 +1,5 @@
+error: CsvDecode derive supports at most one lifetime parameter
+ --> tests/ui/fail/two_lifetimes.rs:7:11
+  |
+7 | struct Two<'a, 'b> {
+  |           ^^^^^^^^

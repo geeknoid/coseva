@@ -1,0 +1,9 @@
+error[E0080]: evaluation panicked: delimiter and quote must be distinct
+  --> tests/ui/fail/csv_format_invalid.rs:8:1
+   |
+ 8 | / csv_format! {
+ 9 | |     pub Broken = FormatOptions::CSV.delimiter(b'"');
+10 | | }
+   | |_^ evaluation of `_` failed here
+   |
+   = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `csv_format` (in Nightly builds, run with -Z macro-backtrace for more info)

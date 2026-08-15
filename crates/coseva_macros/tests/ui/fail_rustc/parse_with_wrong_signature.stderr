@@ -1,0 +1,15 @@
+error[E0308]: mismatched types
+  --> tests/ui/fail_rustc/parse_with_wrong_signature.rs:10:10
+   |
+10 | #[derive(CsvDecode)]
+   |          ^^^^^^^^^
+   |          |
+   |          expected `u32`, found `&[u8]`
+   |          arguments to this function are incorrect
+   |
+note: function defined here
+  --> tests/ui/fail_rustc/parse_with_wrong_signature.rs:6:4
+   |
+ 6 | fn parses_an_int(_value: u32) -> Result<u32, std::convert::Infallible> {
+   |    ^^^^^^^^^^^^^ -----------
+   = note: this error originates in the derive macro `CsvDecode` (in Nightly builds, run with -Z macro-backtrace for more info)

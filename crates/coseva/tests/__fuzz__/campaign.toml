@@ -1,0 +1,158 @@
+# Coverage-guided fuzzing campaign for coseva.
+#
+# Every target below is an ordinary `#[test]` that stays bounded and fast under
+# `cargo test` (it replays its tracked corpus plus a small capped number of
+# generated inputs). The *same* target runs open-ended under a coverage-guided
+# engine via `scripts/fuzz_campaign.py`, seeded from the committed corpus in
+# `corpus_root/<name>/corpus/`.
+#
+# This file is machine-readable so CI can enumerate `[[target]]` tables and
+# invoke each one. The command CI runs for a target is:
+#
+#   crates/coseva/scripts/fuzz_campaign.py <name> --seconds <time>
+#
+# That script reads this file for the target's test binary, features and
+# budget, builds the one `--test` binary with SanitizerCoverage instrumentation
+# and runs it under libFuzzer seeded from `corpus_root/<name>/corpus/`.
+# Discovered failures are written under `corpus_root/<name>/crashes/`; minimize
+# them and commit the reduced input into `corpus_root/<name>/corpus/` as a
+# permanent regression (the bounded `cargo test` run then replays it forever).
+#
+# Why not `cargo bolero test`: cargo-bolero 0.13.4 unconditionally injects
+# `-Cpasses=sancov-module` and builds every test binary in the package rather
+# than the campaign's own `--test` target. With `--sanitizer address` that makes
+# rustc emit ASan destructor references to `__sancov_gen_*` globals nothing
+# defines, so the link fails; with `--sanitizer NONE` the non-fuzz binaries get
+# the instrumentation but never link the libFuzzer runtime that defines
+# `__sanitizer_cov_*`, so that link fails too. The failure reproduces on stable
+# 1.97.1 and on two separate nightlies, and cargo-bolero only ever appends to a
+# pre-existing RUSTFLAGS, so its injection cannot be removed from the outside.
+# The script's build avoids both by dropping ASan and scoping to one `--test`.
+#
+# ASan therefore is not part of the campaign. The `miri` job in ci.yml covers
+# the unsafe kernels on every pull request instead.
+#
+# Where the LLVM sanitizer runtime is unavailable entirely, the corpus and every
+# property still run — unbounded coverage aside — through the ordinary,
+# always-green `cargo test` path:
+#
+#   cargo test -p coseva --test fuzz            --features serde,derive
+#   cargo test -p coseva --test fuzz_index      --features index
+#   cargo test -p coseva --test fuzz_differential
+
+[campaign]
+runner = "crates/coseva/scripts/fuzz_campaign.py"
+package = "coseva"
+# The only engine the runner implements. See the "Why not `cargo bolero test`"
+# note above for why no sanitizer is enabled alongside it.
+default_engine = "libfuzzer"
+# Per-target wall-clock budget for a routine CI campaign. Nightly or release
+# campaigns can raise this; the bounded in-test caps are unaffected.
+default_time = "300s"
+# Matches MAX_INPUT in the raw-byte targets; keeps generated inputs and the
+# csv-core scratch buffers bounded.
+default_max_input_length = 4096
+corpus_root = "crates/coseva/tests/__fuzz__"
+
+# ── Raw parsing and round-trips across every front end (tests/fuzz.rs) ────────
+
+[[target]]
+name = "raw_parsing_across_front_ends"
+test = "fuzz"
+features = ["std"]
+description = """
+Parse one arbitrary document under five representative formats through the
+slice, streaming (io), and push front ends, including single-byte and
+whole-buffer chunk seams, and assert every front end reaches the same outcome.
+"""
+
+[[target]]
+name = "parse_emit_round_trip"
+test = "fuzz"
+features = ["std"]
+description = """
+Re-emit a cleanly parsed document and read it back; a record set that parsed
+must survive the writer/reader pair unchanged.
+"""
+
+[[target]]
+name = "filter_matches_manual_scan"
+test = "fuzz"
+features = ["std"]
+description = """
+The filtering reader must select exactly the records a manual scan with the
+same predicate keeps.
+"""
+
+# ── Typed conversion, native derive and Serde (tests/fuzz.rs, mod typed) ──────
+
+[[target]]
+name = "typed__native_typed_round_trip"
+test = "fuzz"
+features = ["std", "derive", "serde"]
+description = """
+Decode arbitrary bytes into a derived native row type, re-encode, and re-decode;
+a fully typed document must round-trip unchanged.
+"""
+
+[[target]]
+name = "typed__serde_typed_round_trip"
+test = "fuzz"
+features = ["std", "derive", "serde"]
+description = """
+The Serde counterpart of the native typed round-trip, over a positional tuple
+row.
+"""
+
+[[target]]
+name = "typed__native_and_serde_agree_on_typed_rows"
+test = "fuzz"
+features = ["std", "derive", "serde"]
+description = """
+Where both the native derive and Serde fully type the same document, they must
+recover identical field values.
+"""
+
+# ── Persistent index bytes and stateful readers (tests/fuzz_index.rs) ─────────
+
+[[target]]
+name = "index_reader_survives_arbitrary_bytes"
+test = "fuzz_index"
+features = ["index"]
+description = """
+Load a CsvIndexReader from arbitrary bytes and exercise verify / entry / source
+validation. Malformed headers are rejected by construction without allocating,
+and no operation may panic; results are deterministic.
+"""
+
+[[target]]
+name = "csv_index_build_round_trips"
+test = "fuzz_index"
+features = ["index"]
+description = """
+Build an in-memory CsvIndex over an arbitrary source document and check that
+every record offset it reports lies within the source.
+"""
+
+# ── Differential against csv and csv-core (tests/fuzz_differential.rs) ────────
+
+[[target]]
+name = "differential_readers_agree_on_arbitrary_bytes"
+test = "fuzz_differential"
+features = ["std"]
+description = """
+Parse arbitrary bytes under four shared-domain dialects with coseva, csv, and
+csv-core; on success all rows must match, and a coseva rejection must fall in
+the documented-strict class. Inputs carrying a lone CR are skipped as a named
+record-ending exclusion.
+"""
+
+[[target]]
+name = "differential_writer_round_trips_through_all_readers"
+test = "fuzz_differential"
+features = ["std"]
+description = """
+Carve arbitrary bytes into a bounded record set, emit it with both the coseva
+and csv writers, and read each document back through coseva, csv, and csv-core;
+every reader must recover the original rows.
+"""

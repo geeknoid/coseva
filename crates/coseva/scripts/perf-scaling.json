@@ -1,0 +1,220 @@
+{
+  "evidence": {
+    "command": "crates/coseva/scripts/perf_scaling.rs",
+    "host": {
+      "hostname": "mataille-devbox-1",
+      "cpu_model": "AMD EPYC 7763 64-Core Processor",
+      "logical_cpus": 16
+    },
+    "toolchain": {
+      "rustc": "rustc 1.98.0-nightly (6368fd52c 2026-05-29)\nbinary: rustc\ncommit-hash: 6368fd52cb9f230dfb156097625993e7a8891800\ncommit-date: 2026-05-29\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.0-nightly\nLLVM version: 22.1.6",
+      "cargo": "cargo 1.98.0-nightly (fbb61be30 2026-05-26)"
+    },
+    "source": {
+      "revision": "150c304e7991e798ce4361f041a211286f15f31e",
+      "tree_clean": false
+    }
+  },
+  "metric": "median_wall_ms_and_peak_rss_bytes_against_input_size",
+  "repeats": 7,
+  "points": [
+    {
+      "case": "read_slice_borrowed",
+      "bytes": 262161,
+      "records": 14735,
+      "median_ms": 0.268,
+      "min_ms": 0.268,
+      "max_ms": 0.313,
+      "spread_percent": 8.483,
+      "mib_per_second": 932.183,
+      "peak_rss_bytes": 2813952
+    },
+    {
+      "case": "read_slice_borrowed",
+      "bytes": 1048589,
+      "records": 55390,
+      "median_ms": 1.037,
+      "min_ms": 1.022,
+      "max_ms": 1.239,
+      "spread_percent": 10.438,
+      "mib_per_second": 964.221,
+      "peak_rss_bytes": 3596288
+    },
+    {
+      "case": "read_slice_borrowed",
+      "bytes": 4194306,
+      "records": 208765,
+      "median_ms": 6.905,
+      "min_ms": 3.982,
+      "max_ms": 7.448,
+      "spread_percent": 25.1,
+      "mib_per_second": 579.321,
+      "peak_rss_bytes": 6742016
+    },
+    {
+      "case": "read_slice_borrowed",
+      "bytes": 8388611,
+      "records": 406866,
+      "median_ms": 14.835,
+      "min_ms": 13.7,
+      "max_ms": 21.8,
+      "spread_percent": 27.301,
+      "mib_per_second": 539.262,
+      "peak_rss_bytes": 10936320
+    },
+    {
+      "case": "read_slice_borrowed",
+      "bytes": 16777219,
+      "records": 791645,
+      "median_ms": 30.043,
+      "min_ms": 26.645,
+      "max_ms": 41.168,
+      "spread_percent": 24.169,
+      "mib_per_second": 532.565,
+      "peak_rss_bytes": 19324928
+    },
+    {
+      "case": "read_slice_borrowed",
+      "bytes": 33554435,
+      "records": 1536587,
+      "median_ms": 61.833,
+      "min_ms": 53.322,
+      "max_ms": 128.799,
+      "spread_percent": 61.033,
+      "mib_per_second": 517.524,
+      "peak_rss_bytes": 36102144
+    },
+    {
+      "case": "read_io_streaming",
+      "bytes": 262161,
+      "records": 14735,
+      "median_ms": 1.016,
+      "min_ms": 0.991,
+      "max_ms": 5.095,
+      "spread_percent": 202.018,
+      "mib_per_second": 246.123,
+      "peak_rss_bytes": 2818048
+    },
+    {
+      "case": "read_io_streaming",
+      "bytes": 1048589,
+      "records": 55390,
+      "median_ms": 4.251,
+      "min_ms": 4.139,
+      "max_ms": 5.973,
+      "spread_percent": 21.571,
+      "mib_per_second": 235.254,
+      "peak_rss_bytes": 3608576
+    },
+    {
+      "case": "read_io_streaming",
+      "bytes": 4194306,
+      "records": 208765,
+      "median_ms": 20.695,
+      "min_ms": 15.978,
+      "max_ms": 53.185,
+      "spread_percent": 89.892,
+      "mib_per_second": 193.279,
+      "peak_rss_bytes": 6750208
+    },
+    {
+      "case": "read_io_streaming",
+      "bytes": 8388611,
+      "records": 406866,
+      "median_ms": 30.931,
+      "min_ms": 29.84,
+      "max_ms": 61.525,
+      "spread_percent": 51.218,
+      "mib_per_second": 258.642,
+      "peak_rss_bytes": 10944512
+    },
+    {
+      "case": "read_io_streaming",
+      "bytes": 16777219,
+      "records": 791645,
+      "median_ms": 62.44,
+      "min_ms": 60.145,
+      "max_ms": 75.716,
+      "spread_percent": 12.469,
+      "mib_per_second": 256.246,
+      "peak_rss_bytes": 19333120
+    },
+    {
+      "case": "read_io_streaming",
+      "bytes": 33554435,
+      "records": 1536587,
+      "median_ms": 173.727,
+      "min_ms": 139.149,
+      "max_ms": 220.184,
+      "spread_percent": 23.323,
+      "mib_per_second": 184.197,
+      "peak_rss_bytes": 36114432
+    },
+    {
+      "case": "write_io_drain",
+      "bytes": 262161,
+      "records": 14735,
+      "median_ms": 0.738,
+      "min_ms": 0.706,
+      "max_ms": 0.774,
+      "spread_percent": 4.576,
+      "mib_per_second": 338.953,
+      "peak_rss_bytes": 2826240
+    },
+    {
+      "case": "write_io_drain",
+      "bytes": 1048589,
+      "records": 55390,
+      "median_ms": 3.908,
+      "min_ms": 2.624,
+      "max_ms": 5.7,
+      "spread_percent": 39.367,
+      "mib_per_second": 255.916,
+      "peak_rss_bytes": 3608576
+    },
+    {
+      "case": "write_io_drain",
+      "bytes": 4194306,
+      "records": 208765,
+      "median_ms": 11.01,
+      "min_ms": 8.535,
+      "max_ms": 11.676,
+      "spread_percent": 14.264,
+      "mib_per_second": 363.296,
+      "peak_rss_bytes": 6750208
+    },
+    {
+      "case": "write_io_drain",
+      "bytes": 8388611,
+      "records": 406866,
+      "median_ms": 17.944,
+      "min_ms": 14.704,
+      "max_ms": 20.376,
+      "spread_percent": 15.804,
+      "mib_per_second": 445.831,
+      "peak_rss_bytes": 10952704
+    },
+    {
+      "case": "write_io_drain",
+      "bytes": 16777219,
+      "records": 791645,
+      "median_ms": 43.064,
+      "min_ms": 39.245,
+      "max_ms": 47.319,
+      "spread_percent": 9.375,
+      "mib_per_second": 371.536,
+      "peak_rss_bytes": 19271680
+    },
+    {
+      "case": "write_io_drain",
+      "bytes": 33554435,
+      "records": 1536587,
+      "median_ms": 52.243,
+      "min_ms": 46.657,
+      "max_ms": 73.003,
+      "spread_percent": 25.215,
+      "mib_per_second": 612.52,
+      "peak_rss_bytes": 36114432
+    }
+  ]
+}

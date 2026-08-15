@@ -1,0 +1,8 @@
+error: CsvDecode/CsvEncode cannot be derived for unions
+ --> tests/ui/fail/shape_union.rs:6:1
+  |
+6 | / union Overlap {
+7 | |     a: u32,
+8 | |     b: f32,
+9 | | }
+  | |_^

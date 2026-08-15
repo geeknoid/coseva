@@ -1,0 +1,5 @@
+error: expected string literal
+ --> tests/ui/fail/attr_rename_non_string.rs:7:20
+  |
+7 |     #[csv(rename = 7)]
+  |                    ^

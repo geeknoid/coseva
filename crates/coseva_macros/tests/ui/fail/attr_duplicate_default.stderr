@@ -1,0 +1,5 @@
+error: duplicate `default` csv attribute; it may appear at most once
+ --> tests/ui/fail/attr_duplicate_default.rs:8:20
+  |
+8 |     #[csv(default, default)]
+  |                    ^^^^^^^

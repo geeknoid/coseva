@@ -1,0 +1,205 @@
+{
+  "benchmark": {
+    "fingerprint": "86405ca429a95754bcfb88df548ad74a06fb8ba3e91c2158e18ad863573ee45b",
+    "sizes_mib": [
+      2,
+      4,
+      8,
+      32,
+      64
+    ],
+    "threshold_mib": 8
+  },
+  "crossover_mib": 2,
+  "environment_key": "ddac72b1c9fc030470e3785ea032c84a5278727b208183f8666214e140c33169",
+  "gate": {
+    "baseline_mib_per_second": 699.668,
+    "case": "index_build_wallclock/parallel/threads-auto/64MiB"
+  },
+  "host": {
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "hostname": "mataille-devbox-1",
+    "id": "mataille-devbox-1",
+    "logical_cpus": 16,
+    "machine": "x86_64",
+    "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.43"
+  },
+  "measurement_seconds": 5.0,
+  "metric": "criterion_median_throughput_mib_per_second",
+  "points": {
+    "index_build_wallclock/dispatched/2MiB": {
+      "bytes": 2097152,
+      "median_mib_per_second": 328.585,
+      "median_ns": 6086698.805
+    },
+    "index_build_wallclock/dispatched/32MiB": {
+      "bytes": 33554435,
+      "median_mib_per_second": 646.805,
+      "median_ns": 49473937.1
+    },
+    "index_build_wallclock/dispatched/4MiB": {
+      "bytes": 4194306,
+      "median_mib_per_second": 426.667,
+      "median_ns": 9375003.504
+    },
+    "index_build_wallclock/dispatched/64MiB": {
+      "bytes": 67108883,
+      "median_mib_per_second": 693.658,
+      "median_ns": 92264562.5
+    },
+    "index_build_wallclock/dispatched/8MiB": {
+      "bytes": 8388611,
+      "median_mib_per_second": 931.287,
+      "median_ns": 8590265.062
+    },
+    "index_build_wallclock/parallel/threads-auto/2MiB": {
+      "bytes": 2097152,
+      "median_mib_per_second": 385.718,
+      "median_ns": 5185128.555
+    },
+    "index_build_wallclock/parallel/threads-auto/32MiB": {
+      "bytes": 33554435,
+      "median_mib_per_second": 653.134,
+      "median_ns": 48994540.667
+    },
+    "index_build_wallclock/parallel/threads-auto/4MiB": {
+      "bytes": 4194306,
+      "median_mib_per_second": 756.719,
+      "median_ns": 5285979.83
+    },
+    "index_build_wallclock/parallel/threads-auto/64MiB": {
+      "bytes": 67108883,
+      "median_mib_per_second": 699.668,
+      "median_ns": 91471949.167
+    },
+    "index_build_wallclock/parallel/threads-auto/8MiB": {
+      "bytes": 8388611,
+      "median_mib_per_second": 970.749,
+      "median_ns": 8241058.179
+    },
+    "index_build_wallclock/serial/2MiB": {
+      "bytes": 2097152,
+      "median_mib_per_second": 327.199,
+      "median_ns": 6112495.278
+    },
+    "index_build_wallclock/serial/32MiB": {
+      "bytes": 33554435,
+      "median_mib_per_second": 332.095,
+      "median_ns": 96357986.0
+    },
+    "index_build_wallclock/serial/4MiB": {
+      "bytes": 4194306,
+      "median_mib_per_second": 427.508,
+      "median_ns": 9356556.483
+    },
+    "index_build_wallclock/serial/64MiB": {
+      "bytes": 67108883,
+      "median_mib_per_second": 300.117,
+      "median_ns": 213250402.25
+    },
+    "index_build_wallclock/serial/8MiB": {
+      "bytes": 8388611,
+      "median_mib_per_second": 423.264,
+      "median_ns": 18900722.327
+    }
+  },
+  "routing": {
+    "2MiB": {
+      "deviation_percent": 0.422,
+      "expected_builder": "serial",
+      "passed": true,
+      "tolerance_percent": 25.0
+    },
+    "32MiB": {
+      "deviation_percent": 0.978,
+      "expected_builder": "parallel",
+      "passed": true,
+      "tolerance_percent": 25.0
+    },
+    "4MiB": {
+      "deviation_percent": 0.197,
+      "expected_builder": "serial",
+      "passed": true,
+      "tolerance_percent": 25.0
+    },
+    "64MiB": {
+      "deviation_percent": 0.867,
+      "expected_builder": "parallel",
+      "passed": true,
+      "tolerance_percent": 25.0
+    },
+    "8MiB": {
+      "deviation_percent": 4.237,
+      "expected_builder": "parallel",
+      "passed": true,
+      "tolerance_percent": 25.0
+    }
+  },
+  "samples": 20,
+  "schema": 1,
+  "source": {
+    "benchmark_overlay": true,
+    "revision": "f4dbe5c188c88ea4f88323c3cd9f66131514b222",
+    "runtime_tree_clean": false
+  },
+  "speedup_floors": {
+    "cases": {
+      "2MiB": {
+        "blocking": false,
+        "floor": 0.943,
+        "measured": 1.179
+      },
+      "32MiB": {
+        "blocking": true,
+        "floor": 1.573,
+        "measured": 1.967
+      },
+      "4MiB": {
+        "blocking": false,
+        "floor": 1.416,
+        "measured": 1.77
+      },
+      "64MiB": {
+        "blocking": true,
+        "floor": 1.865,
+        "measured": 2.331
+      },
+      "8MiB": {
+        "blocking": true,
+        "floor": 1.835,
+        "measured": 2.293
+      }
+    },
+    "margin_percent": 20.0
+  },
+  "threshold_percent": 10.0,
+  "toolchain": {
+    "LLVM version": "22.1.6",
+    "binary": "rustc",
+    "cargo": "cargo 1.98.0-nightly (fbb61be30 2026-05-26)",
+    "commit_date": "2026-05-29",
+    "commit_hash": "6368fd52cb9f230dfb156097625993e7a8891800",
+    "host": "x86_64-unknown-linux-gnu",
+    "release": "1.98.0-nightly",
+    "version": "rustc 1.98.0-nightly (6368fd52c 2026-05-29)"
+  },
+  "warm_up_seconds": 1.0
+}

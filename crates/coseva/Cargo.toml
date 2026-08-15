@@ -1,0 +1,430 @@
+[package]
+name = "coseva"
+description = "Fast, zero-copy CSV parsing with bounded resource use."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+readme = "../../README.md"
+homepage = "https://github.com/geeknoid/coseva"
+documentation = "https://docs.rs/coseva"
+keywords = ["csv", "parser", "zero-copy", "simd"]
+categories = ["encoding", "parser-implementations"]
+autobenches = false
+
+[features]
+default = ["std"]
+std = ["coseva_unsafe/std"]
+benchmarking = ["std", "coseva_unsafe/benchmarking"]
+derive = ["dep:coseva_macros"]
+index = ["std", "dep:xxhash-rust"]
+serde = ["std", "dep:serde", "compact_str?/serde"]
+compact_str = ["dep:compact_str"]
+# Delimiters and record terminators of more than one byte. Off by default
+# because the bytes they need live in every `FormatOptions` value, which costs
+# parser construction whether or not a dialect uses one.
+multibyte = []
+# Parsing a whole in-memory document across threads. Off by default because it
+# pays only when storage is already faster than a single-threaded parse, and it
+# brings threads into a crate that otherwise has none.
+parallel = ["std"]
+# Test-only. Internal, unstable, and excluded from the public API. Exposes a
+# knob that forces every record onto the general parser so the test suite can
+# use it as an oracle for the vectorized kernel.
+test-util = []
+
+[dependencies]
+coseva_unsafe.workspace = true
+coseva_macros = { workspace = true, optional = true }
+compact_str = { workspace = true, optional = true }
+xxhash-rust = { workspace = true, optional = true }
+fast-float2.workspace = true
+itoa.workspace = true
+ryu.workspace = true
+serde = { workspace = true, optional = true }
+
+[dev-dependencies]
+bolero.workspace = true
+csv.workspace = true
+compact_str.workspace = true
+criterion.workspace = true
+csv-core.workspace = true
+gungraun.workspace = true
+memmap2.workspace = true
+serde = { workspace = true, features = ["derive"] }
+tempfile.workspace = true
+xxhash-rust = { workspace = true }
+
+# Instruction counts for reading one record through each front end, next to
+# `csv-core` doing the same work. Callgrind only; nothing here is wall-clock.
+[[bench]]
+name = "read_record"
+harness = false
+required-features = ["std"]
+
+# The one wall-clock suite: threads execute more instructions to finish sooner,
+# which Callgrind cannot see. Reports the document size above which threads win.
+[[bench]]
+name = "parallel"
+harness = false
+required-features = ["std", "parallel"]
+
+[[bench]]
+name = "matrix"
+harness = false
+required-features = ["std", "derive", "serde"]
+
+[[bench]]
+name = "matrix_byte_record"
+harness = false
+required-features = ["std", "derive", "serde"]
+
+[[bench]]
+name = "matrix_byte_record_io"
+harness = false
+required-features = ["std", "derive", "serde"]
+
+[[example]]
+name = "document_dimensions"
+required-features = ["std"]
+
+# The owned-record counterparts, next to the `csv` crate. `csv-core` has no
+# record type and does not read, so it is the wrong peer for these.
+[[bench]]
+name = "byte_record"
+harness = false
+required-features = ["std"]
+
+[[bench]]
+name = "text_record"
+harness = false
+required-features = ["std"]
+
+# Rewriting an owned record field by field. Prices the equal-length short
+# circuit against the length-changing path, which is quadratic in field count.
+[[bench]]
+name = "set_field"
+harness = false
+required-features = ["std"]
+
+# Deserializing two of six columns into a Serde struct, next to the `csv` crate,
+# borrowed and owned. Needs the `serde` layer, so it is gated on that feature.
+[[bench]]
+name = "deserialize"
+harness = false
+required-features = ["std", "serde"]
+
+# The same two columns and corpus as `deserialize`, but through coseva's own
+# `CsvDecode` derive rather than Serde. `csv` has no typed decoding, so its two
+# cases stay on Serde and are the same numbers `deserialize` reports for them.
+[[bench]]
+name = "decode"
+harness = false
+required-features = ["std", "derive", "serde", "compact_str"]
+
+# `decode` at a width where ignored columns dominate: a hundred columns, of
+# which a target names five. This is the shape projection was supposed to serve,
+# so it is the shape that has to justify its absence.
+[[bench]]
+name = "decode_wide"
+harness = false
+required-features = ["std", "derive"]
+
+[[bench]]
+name = "width_sweep"
+harness = false
+required-features = ["std", "derive", "serde"]
+
+[[bench]]
+name = "materialization"
+harness = false
+required-features = ["std", "derive", "benchmarking"]
+
+[[bench]]
+name = "decode_into"
+harness = false
+required-features = ["std", "derive"]
+
+[[bench]]
+name = "startup"
+harness = false
+required-features = ["std"]
+
+[[bench]]
+name = "mapping"
+harness = false
+required-features = ["std", "serde"]
+
+[[bench]]
+name = "encode"
+harness = false
+required-features = ["std", "derive", "serde"]
+
+# Scheduled file-backed writer/path comparison. Absolute throughput and
+# below-parity cases are report-only; its runner gates only coseva/csv ratios
+# whose baseline is at or above parity.
+[[bench]]
+name = "encode_wallclock"
+harness = false
+required-features = ["std", "derive", "serde"]
+
+[[bench]]
+name = "quoted"
+harness = false
+required-features = ["std"]
+
+# The quoting predicate's two scans against each other at a fixed field width,
+# which is what makes `SIMD_QUOTING_SCAN_BYTES` re-derivable rather than
+# asserted in a comment.
+[[bench]]
+name = "needs_quotes"
+harness = false
+required-features = ["std", "benchmarking"]
+
+# Which runtime-selected kernel arm the profiled process reached, recorded from
+# inside it because the profiler emulates the CPU that answers `CPUID`.
+[[bench]]
+name = "dispatch"
+harness = false
+required-features = ["std", "benchmarking"]
+
+[[bench]]
+name = "window"
+harness = false
+required-features = ["std", "multibyte"]
+
+[[bench]]
+name = "filter"
+harness = false
+required-features = ["std"]
+
+[[bench]]
+name = "literal_search"
+harness = false
+required-features = ["std"]
+
+[[bench]]
+name = "index"
+harness = false
+required-features = ["std", "index", "derive"]
+
+[[bench]]
+name = "index_build_wallclock"
+harness = false
+required-features = ["std", "index", "parallel", "benchmarking"]
+
+[[bench]]
+name = "dialects"
+harness = false
+required-features = ["std", "multibyte"]
+
+[[test]]
+name = "auto_dispatch"
+required-features = ["std"]
+
+[[test]]
+name = "compact_str"
+required-features = ["std", "derive", "compact_str"]
+
+[[test]]
+name = "consume"
+required-features = ["std", "derive", "serde"]
+
+[[test]]
+name = "python_escape"
+required-features = ["std"]
+
+[[test]]
+name = "parallel"
+required-features = ["std", "parallel"]
+
+[[test]]
+name = "multibyte"
+required-features = ["std", "multibyte"]
+
+[[test]]
+name = "prescan_promptness"
+required-features = ["std", "multibyte"]
+
+[[test]]
+name = "format_parity"
+required-features = ["std", "derive"]
+
+[[test]]
+name = "fused_decode"
+required-features = ["std", "derive"]
+
+[[test]]
+name = "static_format"
+required-features = ["std"]
+
+[[test]]
+name = "traits"
+required-features = ["std"]
+
+[[test]]
+name = "fuzz"
+required-features = ["std"]
+
+[[test]]
+name = "pairwise_matrix"
+required-features = ["std"]
+
+[[test]]
+name = "fuzz_index"
+required-features = ["index"]
+
+[[test]]
+name = "fuzz_differential"
+required-features = ["std"]
+
+[[test]]
+name = "derive"
+required-features = ["std", "derive", "serde"]
+
+[[test]]
+name = "serde"
+required-features = ["serde"]
+
+[[test]]
+name = "index"
+required-features = ["index"]
+
+[[test]]
+name = "index_generate"
+required-features = ["index", "derive"]
+
+[[test]]
+name = "push"
+required-features = ["std"]
+
+[[test]]
+name = "chunk"
+required-features = ["std"]
+
+[[test]]
+name = "projection"
+required-features = ["std"]
+
+[[test]]
+name = "differential"
+required-features = ["std"]
+
+[[test]]
+name = "split_differential"
+required-features = ["std"]
+
+[[test]]
+name = "miri_unsafe"
+required-features = ["std"]
+
+[[test]]
+name = "filter"
+required-features = ["std"]
+
+[[test]]
+name = "parser"
+required-features = ["std"]
+
+[[test]]
+name = "io"
+required-features = ["std"]
+
+[[test]]
+name = "emitter"
+required-features = ["std"]
+
+[[test]]
+name = "emitter_parity"
+required-features = ["std"]
+
+[[test]]
+name = "no_std"
+
+[[test]]
+name = "line"
+required-features = ["std", "derive"]
+
+[[test]]
+name = "iter"
+required-features = ["std", "derive"]
+
+[[test]]
+name = "records"
+required-features = ["std"]
+
+[[test]]
+name = "benchmark_api"
+required-features = ["benchmarking"]
+
+[[test]]
+name = "benchmark_parity"
+required-features = ["std"]
+
+[[test]]
+name = "bom_matrix"
+required-features = ["std"]
+
+[[example]]
+name = "quickstart"
+required-features = ["std"]
+
+[[example]]
+name = "io"
+required-features = ["std"]
+
+[[example]]
+name = "dialects"
+required-features = ["std"]
+
+[[example]]
+name = "static_formats"
+required-features = ["std"]
+
+[[example]]
+name = "filtering"
+required-features = ["std"]
+
+[[example]]
+name = "projection"
+required-features = ["std"]
+
+[[example]]
+name = "errors"
+required-features = ["std"]
+
+[[example]]
+name = "push"
+required-features = ["std"]
+
+[[example]]
+name = "writing"
+required-features = ["std", "derive"]
+
+[[example]]
+name = "typed_decode"
+required-features = ["std", "derive"]
+
+[[example]]
+name = "split_and_append"
+required-features = ["std", "derive"]
+
+[[example]]
+name = "serde_roundtrip"
+required-features = ["std", "serde"]
+
+[[example]]
+name = "indexed"
+required-features = ["std", "index"]
+
+[lints]
+workspace = true
+
+[package.metadata.docs.rs]
+all-features = true
+
+[[bench]]
+name = "bulk_decode"
+harness = false
+required-features = ["std", "derive"]

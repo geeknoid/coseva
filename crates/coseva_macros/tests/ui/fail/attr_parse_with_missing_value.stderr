@@ -1,0 +1,5 @@
+error: expected `=`
+ --> tests/ui/fail/attr_parse_with_missing_value.rs:7:21
+  |
+7 |     #[csv(parse_with)]
+  |                     ^

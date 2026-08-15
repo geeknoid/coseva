@@ -1,0 +1,503 @@
+{
+  "benchmark": {
+    "batch_records": [
+      32,
+      256,
+      4096,
+      16384
+    ],
+    "default_batch_records": 4096,
+    "fingerprint": "9a3477e5cea6f74553bdba80864f96645f26caf305162b00f32cfd5790ce8ca8",
+    "sizes_mib": [
+      8,
+      16,
+      32,
+      64
+    ],
+    "threads": [
+      "2",
+      "4",
+      "8",
+      "auto"
+    ]
+  },
+  "crossover_mib": {
+    "fold/threads-2": null,
+    "fold/threads-4": 8,
+    "fold/threads-8": 8,
+    "fold/threads-auto": 8,
+    "owned/batch-16384/threads-auto": 16,
+    "owned/batch-256/threads-auto": null,
+    "owned/batch-32/threads-auto": null,
+    "owned/batch-4096/threads-auto": 32,
+    "owned/threads-2": null,
+    "owned/threads-4": null,
+    "owned/threads-8": null,
+    "owned/threads-auto": 32
+  },
+  "environment_key": "ddac72b1c9fc030470e3785ea032c84a5278727b208183f8666214e140c33169",
+  "gate": {
+    "baseline_mib_per_second": 822.563,
+    "case": "parallel/owned/threads-auto/64MiB"
+  },
+  "host": {
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "hostname": "mataille-devbox-1",
+    "id": "mataille-devbox-1",
+    "logical_cpus": 16,
+    "machine": "x86_64",
+    "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.43"
+  },
+  "measurement_seconds": 3.0,
+  "metric": "criterion_median_throughput_mib_per_second",
+  "points": {
+    "parallel/fold/threads-2/16MiB": {
+      "bytes": 16777219,
+      "median_mib_per_second": 723.746,
+      "median_ns": 22107201.48
+    },
+    "parallel/fold/threads-2/32MiB": {
+      "bytes": 33554435,
+      "median_mib_per_second": 957.81,
+      "median_ns": 33409556.375
+    },
+    "parallel/fold/threads-2/64MiB": {
+      "bytes": 67108883,
+      "median_mib_per_second": 463.13,
+      "median_ns": 138190220.167
+    },
+    "parallel/fold/threads-2/8MiB": {
+      "bytes": 8388611,
+      "median_mib_per_second": 816.074,
+      "median_ns": 9803035.546
+    },
+    "parallel/fold/threads-4/16MiB": {
+      "bytes": 16777219,
+      "median_mib_per_second": 1155.877,
+      "median_ns": 13842309.538
+    },
+    "parallel/fold/threads-4/32MiB": {
+      "bytes": 33554435,
+      "median_mib_per_second": 1206.761,
+      "median_ns": 26517260.9
+    },
+    "parallel/fold/threads-4/64MiB": {
+      "bytes": 67108883,
+      "median_mib_per_second": 1590.019,
+      "median_ns": 40251114.0
+    },
+    "parallel/fold/threads-4/8MiB": {
+      "bytes": 8388611,
+      "median_mib_per_second": 951.039,
+      "median_ns": 8411854.542
+    },
+    "parallel/fold/threads-8/16MiB": {
+      "bytes": 16777219,
+      "median_mib_per_second": 1380.317,
+      "median_ns": 11591538.85
+    },
+    "parallel/fold/threads-8/32MiB": {
+      "bytes": 33554435,
+      "median_mib_per_second": 1554.017,
+      "median_ns": 20591794.647
+    },
+    "parallel/fold/threads-8/64MiB": {
+      "bytes": 67108883,
+      "median_mib_per_second": 1881.544,
+      "median_ns": 34014621.4
+    },
+    "parallel/fold/threads-8/8MiB": {
+      "bytes": 8388611,
+      "median_mib_per_second": 1131.172,
+      "median_ns": 7072316.281
+    },
+    "parallel/fold/threads-auto/16MiB": {
+      "bytes": 16777219,
+      "median_mib_per_second": 1361.593,
+      "median_ns": 11750946.0
+    },
+    "parallel/fold/threads-auto/32MiB": {
+      "bytes": 33554435,
+      "median_mib_per_second": 1487.47,
+      "median_ns": 21513041.118
+    },
+    "parallel/fold/threads-auto/64MiB": {
+      "bytes": 67108883,
+      "median_mib_per_second": 2168.406,
+      "median_ns": 29514782.6
+    },
+    "parallel/fold/threads-auto/8MiB": {
+      "bytes": 8388611,
+      "median_mib_per_second": 912.616,
+      "median_ns": 8766012.518
+    },
+    "parallel/owned/batch-16384/threads-auto/16MiB": {
+      "bytes": 16777219,
+      "median_mib_per_second": 415.814,
+      "median_ns": 38478711.5
+    },
+    "parallel/owned/batch-16384/threads-auto/32MiB": {
+      "bytes": 33554435,
+      "median_mib_per_second": 588.753,
+      "median_ns": 54352183.833
+    },
+    "parallel/owned/batch-16384/threads-auto/64MiB": {
+      "bytes": 67108883,
+      "median_mib_per_second": 730.847,
+      "median_ns": 87569631.25
+    },
+    "parallel/owned/batch-16384/threads-auto/8MiB": {
+      "bytes": 8388611,
+      "median_mib_per_second": 254.483,
+      "median_ns": 31436318.9
+    },
+    "parallel/owned/batch-256/threads-auto/16MiB": {
+      "bytes": 16777219,
+      "median_mib_per_second": 61.372,
+      "median_ns": 260704594.0
+    },
+    "parallel/owned/batch-256/threads-auto/32MiB": {
+      "bytes": 33554435,
+      "median_mib_per_second": 78.472,
+      "median_ns": 407787843.5
+    },
+    "parallel/owned/batch-256/threads-auto/64MiB": {
+      "bytes": 67108883,
+      "median_mib_per_second": 94.813,
+      "median_ns": 675013192.0
+    },
+    "parallel/owned/batch-256/threads-auto/8MiB": {
+      "bytes": 8388611,
+      "median_mib_per_second": 84.668,
+      "median_ns": 94487200.25
+    },
+    "parallel/owned/batch-32/threads-auto/16MiB": {
+      "bytes": 16777219,
+      "median_mib_per_second": 27.154,
+      "median_ns": 589235316.0
+    },
+    "parallel/owned/batch-32/threads-auto/32MiB": {
+      "bytes": 33554435,
+      "median_mib_per_second": 26.761,
+      "median_ns": 1195776318.5
+    },
+    "parallel/owned/batch-32/threads-auto/64MiB": {
+      "bytes": 67108883,
+      "median_mib_per_second": 34.639,
+      "median_ns": 1847648435.0
+    },
+    "parallel/owned/batch-32/threads-auto/8MiB": {
+      "bytes": 8388611,
+      "median_mib_per_second": 17.766,
+      "median_ns": 450302854.0
+    },
+    "parallel/owned/threads-2/16MiB": {
+      "bytes": 16777219,
+      "median_mib_per_second": 218.058,
+      "median_ns": 73374832.833
+    },
+    "parallel/owned/threads-2/32MiB": {
+      "bytes": 33554435,
+      "median_mib_per_second": 210.505,
+      "median_ns": 152015463.5
+    },
+    "parallel/owned/threads-2/64MiB": {
+      "bytes": 67108883,
+      "median_mib_per_second": 180.477,
+      "median_ns": 354615979.5
+    },
+    "parallel/owned/threads-2/8MiB": {
+      "bytes": 8388611,
+      "median_mib_per_second": 194.306,
+      "median_ns": 41172204.625
+    },
+    "parallel/owned/threads-4/16MiB": {
+      "bytes": 16777219,
+      "median_mib_per_second": 333.032,
+      "median_ns": 48043488.875
+    },
+    "parallel/owned/threads-4/32MiB": {
+      "bytes": 33554435,
+      "median_mib_per_second": 357.423,
+      "median_ns": 89529771.75
+    },
+    "parallel/owned/threads-4/64MiB": {
+      "bytes": 67108883,
+      "median_mib_per_second": 239.65,
+      "median_ns": 267056747.5
+    },
+    "parallel/owned/threads-4/8MiB": {
+      "bytes": 8388611,
+      "median_mib_per_second": 293.141,
+      "median_ns": 27290654.131
+    },
+    "parallel/owned/threads-8/16MiB": {
+      "bytes": 16777219,
+      "median_mib_per_second": 491.665,
+      "median_ns": 32542504.875
+    },
+    "parallel/owned/threads-8/32MiB": {
+      "bytes": 33554435,
+      "median_mib_per_second": 552.741,
+      "median_ns": 57893322.833
+    },
+    "parallel/owned/threads-8/64MiB": {
+      "bytes": 67108883,
+      "median_mib_per_second": 600.131,
+      "median_ns": 106643482.5
+    },
+    "parallel/owned/threads-8/8MiB": {
+      "bytes": 8388611,
+      "median_mib_per_second": 313.871,
+      "median_ns": 25488168.608
+    },
+    "parallel/owned/threads-auto/16MiB": {
+      "bytes": 16777219,
+      "median_mib_per_second": 381.483,
+      "median_ns": 41941616.75
+    },
+    "parallel/owned/threads-auto/32MiB": {
+      "bytes": 33554435,
+      "median_mib_per_second": 512.272,
+      "median_ns": 62466809.167
+    },
+    "parallel/owned/threads-auto/64MiB": {
+      "bytes": 67108883,
+      "median_mib_per_second": 822.563,
+      "median_ns": 77805643.5
+    },
+    "parallel/owned/threads-auto/8MiB": {
+      "bytes": 8388611,
+      "median_mib_per_second": 292.441,
+      "median_ns": 27355976.5
+    },
+    "parallel/serial/borrowed/16MiB": {
+      "bytes": 16777219,
+      "median_mib_per_second": 588.601,
+      "median_ns": 27183093.338
+    },
+    "parallel/serial/borrowed/32MiB": {
+      "bytes": 33554435,
+      "median_mib_per_second": 643.441,
+      "median_ns": 49732578.25
+    },
+    "parallel/serial/borrowed/64MiB": {
+      "bytes": 67108883,
+      "median_mib_per_second": 930.608,
+      "median_ns": 68772298.333
+    },
+    "parallel/serial/borrowed/8MiB": {
+      "bytes": 8388611,
+      "median_mib_per_second": 600.549,
+      "median_ns": 13321158.972
+    },
+    "parallel/serial/owned/16MiB": {
+      "bytes": 16777219,
+      "median_mib_per_second": 411.256,
+      "median_ns": 38905255.25
+    },
+    "parallel/serial/owned/32MiB": {
+      "bytes": 33554435,
+      "median_mib_per_second": 458.896,
+      "median_ns": 69732508.167
+    },
+    "parallel/serial/owned/64MiB": {
+      "bytes": 67108883,
+      "median_mib_per_second": 636.483,
+      "median_ns": 100552673.25
+    },
+    "parallel/serial/owned/8MiB": {
+      "bytes": 8388611,
+      "median_mib_per_second": 430.468,
+      "median_ns": 18584447.578
+    }
+  },
+  "samples": 20,
+  "schema": 1,
+  "serial_ratios": {
+    "fold/threads-2": {
+      "16MiB": 1.2296,
+      "32MiB": 1.4886,
+      "64MiB": 0.4977,
+      "8MiB": 1.3589
+    },
+    "fold/threads-4": {
+      "16MiB": 1.9638,
+      "32MiB": 1.8755,
+      "64MiB": 1.7086,
+      "8MiB": 1.5836
+    },
+    "fold/threads-8": {
+      "16MiB": 2.3451,
+      "32MiB": 2.4152,
+      "64MiB": 2.0218,
+      "8MiB": 1.8836
+    },
+    "fold/threads-auto": {
+      "16MiB": 2.3133,
+      "32MiB": 2.3117,
+      "64MiB": 2.3301,
+      "8MiB": 1.5196
+    },
+    "owned/batch-16384/threads-auto": {
+      "16MiB": 1.0111,
+      "32MiB": 1.283,
+      "64MiB": 1.1483,
+      "8MiB": 0.5912
+    },
+    "owned/batch-256/threads-auto": {
+      "16MiB": 0.1492,
+      "32MiB": 0.171,
+      "64MiB": 0.149,
+      "8MiB": 0.1967
+    },
+    "owned/batch-32/threads-auto": {
+      "16MiB": 0.066,
+      "32MiB": 0.0583,
+      "64MiB": 0.0544,
+      "8MiB": 0.0413
+    },
+    "owned/batch-4096/threads-auto": {
+      "16MiB": 0.9276,
+      "32MiB": 1.1163,
+      "64MiB": 1.2924,
+      "8MiB": 0.6794
+    },
+    "owned/threads-2": {
+      "16MiB": 0.5302,
+      "32MiB": 0.4587,
+      "64MiB": 0.2836,
+      "8MiB": 0.4514
+    },
+    "owned/threads-4": {
+      "16MiB": 0.8098,
+      "32MiB": 0.7789,
+      "64MiB": 0.3765,
+      "8MiB": 0.681
+    },
+    "owned/threads-8": {
+      "16MiB": 1.1955,
+      "32MiB": 1.2045,
+      "64MiB": 0.9429,
+      "8MiB": 0.7291
+    },
+    "owned/threads-auto": {
+      "16MiB": 0.9276,
+      "32MiB": 1.1163,
+      "64MiB": 1.2924,
+      "8MiB": 0.6794
+    }
+  },
+  "skew": {
+    "cases": {
+      "threads-2": {
+        "borrowed_speedup": 0.7496,
+        "owned_speedup": 0.5257,
+        "rotation_cost": 0.2988
+      },
+      "threads-4": {
+        "borrowed_speedup": 2.5086,
+        "owned_speedup": 0.8574,
+        "rotation_cost": 0.6582
+      },
+      "threads-8": {
+        "borrowed_speedup": 2.8231,
+        "owned_speedup": 1.2839,
+        "rotation_cost": 0.5452
+      }
+    },
+    "size_mib": 32
+  },
+  "skew_points": {
+    "skew/fold/threads-2/32MiB": {
+      "bytes": 33554913,
+      "median_mib_per_second": 343.073,
+      "median_ns": 93275869.333
+    },
+    "skew/fold/threads-4/32MiB": {
+      "bytes": 33554913,
+      "median_mib_per_second": 1148.086,
+      "median_ns": 27872869.083
+    },
+    "skew/fold/threads-8/32MiB": {
+      "bytes": 33554913,
+      "median_mib_per_second": 1292.005,
+      "median_ns": 24768053.326
+    },
+    "skew/owned/threads-2/32MiB": {
+      "bytes": 33554913,
+      "median_mib_per_second": 258.869,
+      "median_ns": 123616544.5
+    },
+    "skew/owned/threads-4/32MiB": {
+      "bytes": 33554913,
+      "median_mib_per_second": 422.22,
+      "median_ns": 75791042.75
+    },
+    "skew/owned/threads-8/32MiB": {
+      "bytes": 33554913,
+      "median_mib_per_second": 632.261,
+      "median_ns": 50612696.833
+    },
+    "skew/serial/borrowed/32MiB": {
+      "bytes": 33554913,
+      "median_mib_per_second": 457.653,
+      "median_ns": 69922914.333
+    },
+    "skew/serial/owned/32MiB": {
+      "bytes": 33554913,
+      "median_mib_per_second": 492.447,
+      "median_ns": 64982502.167
+    }
+  },
+  "source": {
+    "benchmark_overlay": false,
+    "revision": "2c1f7f4a844d659d7f38e3b672953b86c09e8f4e",
+    "runtime_tree_clean": true
+  },
+  "speedup_floors": {
+    "cases": {
+      "borrowed_fold_64MiB": {
+        "blocking": true,
+        "floor": 1.864,
+        "measured": 2.33
+      },
+      "owned_batch_64MiB": {
+        "blocking": true,
+        "floor": 1.15,
+        "measured": 1.292
+      }
+    },
+    "margin_percent": 20.0
+  },
+  "threshold_percent": 10.0,
+  "toolchain": {
+    "LLVM version": "22.1.6",
+    "binary": "rustc",
+    "cargo": "cargo 1.98.0-nightly (fbb61be30 2026-05-26)",
+    "commit_date": "2026-05-29",
+    "commit_hash": "6368fd52cb9f230dfb156097625993e7a8891800",
+    "host": "x86_64-unknown-linux-gnu",
+    "release": "1.98.0-nightly",
+    "version": "rustc 1.98.0-nightly (6368fd52c 2026-05-29)"
+  },
+  "warm_up_seconds": 1.0
+}

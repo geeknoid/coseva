@@ -1,0 +1,5 @@
+error: duplicate `rename_all` csv attribute; it may appear at most once
+ --> tests/ui/fail/attr_duplicate_rename_all.rs:7:34
+  |
+7 | #[csv(rename_all = "snake_case", rename_all = "kebab-case")]
+  |                                  ^^^^^^^^^^

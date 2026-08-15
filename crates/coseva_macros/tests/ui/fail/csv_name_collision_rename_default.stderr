@@ -1,0 +1,6 @@
+error: the CSV name `a` is already used by field `a`, so the generated header would repeat a column and could not be read back; give one of them a distinct `#[csv(rename = "...")]`
+  --> tests/ui/fail/csv_name_collision_rename_default.rs:10:5
+   |
+10 | /     #[csv(rename = "a")]
+11 | |     b: String,
+   | |_____________^

@@ -1,0 +1,6 @@
+error: the CSV name `shared` is already used by field `a`, so the generated header would repeat a column and could not be read back; give one of them a distinct `#[csv(rename = "...")]`
+  --> tests/ui/fail/csv_name_collision_rename_rename.rs:10:5
+   |
+10 | /     #[csv(rename = "shared")]
+11 | |     b: String,
+   | |_____________^

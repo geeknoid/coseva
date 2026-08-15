@@ -1,0 +1,5 @@
+error: `default` conflicts with `parse_with`; `parse_with` already produces the decoded value
+  --> tests/ui/fail/attr_conflict_default_parse_with.rs:12:11
+   |
+12 |     #[csv(default, parse_with = "parse_it")]
+   |           ^^^^^^^

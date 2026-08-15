@@ -1,0 +1,214 @@
+name: Scheduled
+
+# Expensive, non-blocking-for-merge Bolero campaigns for coseva.
+#
+# These are deliberately kept out of ci.yml: a meaningful Bolero campaign runs
+# for minutes per target, which would make an ordinary pull request
+# impractical. They run on a daily schedule and are also manually dispatchable
+# (`workflow_dispatch`) so a maintainer can kick them off on demand, e.g. right
+# after landing a change to the fuzz generators, without waiting for the next
+# scheduled run.
+#
+# Miri is *not* here. The raw-pointer kernels it checks are the crate's most
+# exercised unsafe code, and `tests/miri_unsafe.rs` asserts nothing about
+# output by design — so a native run of the same corpus proves very little and
+# a scheduled-only Miri run leaves the gap open between schedules. The target
+# is bounded enough (about 90 seconds of interpretation) to gate on, so it is a
+# required check in ci.yml instead.
+#
+# A scheduled workflow has no pull request to turn red, so `notify` below opens
+# or updates a tracking issue when a campaign fails. Without it a failing
+# campaign is a red badge nobody is looking at.
+#
+# Bolero jobs (`bolero-plan` + `bolero`): the campaign target list is not
+# hard-coded here. `crates/coseva/tests/__fuzz__/campaign.toml` enumerates
+# every campaign target (currently 10, spanning tests/fuzz.rs,
+# tests/fuzz_index.rs and tests/fuzz_differential.rs) along with its test
+# file, required features and the shared engine/budget defaults;
+# `bolero-plan` parses that file once and turns it into this workflow's job
+# matrix, so adding, renaming or removing a campaign target there is
+# automatically reflected here with no further edits to this file. See the
+# `bolero-plan` job below for the parser and its consistency checks
+# (duplicate names, missing required keys).
+
+on:
+  schedule:
+    # 06:00 UTC daily.
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+    inputs:
+      bolero_seconds:
+        description: >-
+          Per-target Bolero campaign duration, in seconds. Leave empty to use
+          campaign.toml's own [campaign].default_time.
+        required: false
+        default: ""
+
+concurrency:
+  group: scheduled-${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  bolero-plan:
+    name: bolero-plan
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      default_time_seconds: ${{ steps.plan.outputs.default_time_seconds }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # crates/coseva/tests/__fuzz__/campaign.toml is the
+      # single, machine-readable source of truth for every Bolero campaign
+      # target, its test file, its required features and the campaign's
+      # shared engine/budget defaults. This step is the only place
+      # that file is read; the `bolero` job below carries no target list or
+      # command-shape knowledge of its own, so it cannot go stale the way a
+      # hard-coded matrix would when targets are added, renamed or removed.
+      - name: derive the Bolero target matrix from campaign.toml
+        id: plan
+        shell: python3 {0}
+        run: |
+          import json
+          import os
+          import sys
+          import tomllib
+
+          path = "crates/coseva/tests/__fuzz__/campaign.toml"
+          with open(path, "rb") as f:
+              campaign = tomllib.load(f)
+
+          info = campaign.get("campaign", {})
+          targets = campaign.get("target", [])
+
+          if not targets:
+              sys.exit(f"{path}: no [[target]] entries found")
+
+          names = [t.get("name") for t in targets]
+          if len(names) != len(set(names)):
+              sys.exit(f"{path}: duplicate [[target]] name(s) among {names}")
+
+          matrix = []
+          for t in targets:
+              missing = [k for k in ("name", "test", "features") if k not in t]
+              if missing:
+                  sys.exit(f"{path}: target {t!r} is missing key(s) {missing}")
+              # `name` is both the job label and the sole argument the runner
+              # needs: it is the corpus directory under corpus_root/, and the
+              # runner re-reads this same file for the target's test binary and
+              # features. The keys checked above are validated here rather than
+              # only in the runner so a malformed entry fails the cheap plan job
+              # instead of ten expensive campaign jobs.
+              matrix.append({"name": t["name"]})
+
+          for key in ("package", "default_engine", "default_time",
+                      "default_max_input_length", "corpus_root"):
+              if key not in info:
+                  sys.exit(f"{path}: [campaign] is missing key {key!r}")
+
+          default_time = str(info["default_time"])
+          if not default_time.endswith("s"):
+              sys.exit(f"{path}: [campaign].default_time {default_time!r} must end in 's'")
+
+          print(
+              f"discovered {len(matrix)} campaign target(s): {', '.join(names)}",
+              file=sys.stderr,
+          )
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as out:
+              out.write(f"matrix={json.dumps(matrix)}\n")
+              out.write(f"default_time_seconds={default_time[:-1]}\n")
+
+  bolero:
+    name: bolero (${{ matrix.name }})
+    needs: bolero-plan
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.bolero-plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v5
+
+      # The campaign builds SanitizerCoverage-instrumented code, which is
+      # nightly machinery; the runner sets RUSTC_BOOTSTRAP so the ordinary
+      # stable toolchain can build it. `llvm-tools-preview` supplies the
+      # libFuzzer runtime the instrumented binary links against.
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # The runner reads campaign.toml for this target's test binary, features
+      # and input cap, so this step carries no command-shape knowledge of its
+      # own. A crash exits non-zero and leaves the reproducer under
+      # tests/__fuzz__/<target>/crashes/, which the upload step below preserves
+      # and the notify job turns into a tracking issue.
+      - name: fuzz ${{ matrix.name }}
+        run: |
+          crates/coseva/scripts/fuzz_campaign.py ${{ matrix.name }} \
+            --seconds ${{ github.event.inputs.bolero_seconds || needs.bolero-plan.outputs.default_time_seconds }}
+
+      # A crash that exists only in a finished runner's filesystem is a crash
+      # nobody can minimize.
+      - name: upload crash reproducers
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: crashes-${{ matrix.name }}
+          path: crates/coseva/tests/__fuzz__/${{ matrix.name }}/crashes/
+          if-no-files-found: ignore
+
+  notify:
+    name: notify
+    needs: [bolero-plan, bolero]
+    if: always() && (needs.bolero.result == 'failure' || needs.bolero-plan.result == 'failure')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      # A scheduled workflow has no pull request to turn red, so a failing
+      # campaign is otherwise only a badge on a page nobody has open. One
+      # tracking issue is reused across runs — reopened and commented rather
+      # than duplicated — so a campaign that keeps failing does not bury the
+      # rest of the issue list.
+      - name: Open or update the campaign-failure issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="Scheduled Bolero campaign failed"
+          body="A scheduled fuzzing campaign failed.
+
+          Run: $RUN_URL
+
+          Any crash found is written to \`crates/coseva/tests/__fuzz__/<target>/crashes/\`
+          in that run's artifacts. Minimize it and commit the reduced input into the
+          matching \`corpus/\` directory so the bounded \`cargo test\` replay keeps it
+          forever, then fix the defect."
+
+          existing="$(gh issue list --search "$title in:title" --state all --limit 1 --json number --jq '.[0].number')"
+          if [ -n "$existing" ]; then
+            gh issue reopen "$existing" 2>/dev/null || true
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi
